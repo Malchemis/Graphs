@@ -78,14 +78,20 @@ class Graph:
             raise ValueError("Couldn't save the solution: File path not set.")
         path = self.solve(strategy)
 
-        if path is None :
+        if path is None:
             print("Couldn't save the solution: No path found.")
             return
 
-        for node in path:
-            pass
-            #TODO: Save the path in file
+        file_name = self.file_path.split("/")[-1].split(".")[0]
+        text_to_save = ""
 
+        for node in path:
+            text_to_save += f"({node.position[0]} {node.position[1]}) -> "
+
+        text_to_save = text_to_save[:-4]
+
+        with open(f"solutions/sol_{file_name}.txt", "w") as f:
+            f.write(text_to_save)
 
     # Utils
     def extend_graph(self, position: Tuple[int, int]) -> List[List[Node]]:

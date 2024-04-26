@@ -16,15 +16,11 @@ def aStar(start_node: Node, end_node: Node) -> Optional[List[Node]]:
     """
     open_list = [start_node]
     closed_list = set()
-    previous_node = start_node
 
     # Loop until the open list is empty
     while open_list:
         # Use a priority queue to get the node with the lowest f value
         current_node = heapq.heappop(open_list)
-        if previous_node != current_node:   # Update the parent node
-            current_node.parent = previous_node
-            previous_node = current_node
 
         if current_node == end_node:  # Path found
             path = []
@@ -51,6 +47,7 @@ def aStar(start_node: Node, end_node: Node) -> Optional[List[Node]]:
 
             if neighbor not in open_list:  # To be visited
                 heapq.heappush(open_list, neighbor)
+                neighbor.parent = current_node
 
     return None
 

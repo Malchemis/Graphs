@@ -1,5 +1,7 @@
 from typing import Optional, Tuple, Dict, Any
 
+from utils.constants import get_direction
+
 
 class Node:
     """
@@ -24,6 +26,7 @@ class Node:
     def add_neighbor(self, node_neighbor: 'Node', cost: int):
         direction = (node_neighbor.position[0] - self.position[0], node_neighbor.position[1] - self.position[1])
         self.neighbors[direction] = (cost, node_neighbor)
+        node_neighbor.neighbors[(-direction[0], -direction[1])] = (cost, self)
 
     def __eq__(self, other: 'Node') -> bool:
         return self.position == other.position
@@ -33,3 +36,12 @@ class Node:
 
     def __hash__(self) -> int:
         return hash(self.position)
+
+    def __str__(self) -> str:
+        neighbors_directions = []
+        try :
+            for direction, neighbor in self.neighbors.items():
+                neighbors_directions.append(f'{get_direction(direction)}: {neighbor[0]}')
+        except:
+            pass
+        return f'Node at {self.position}, neighbors: {neighbors_directions}'

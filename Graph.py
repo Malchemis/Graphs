@@ -11,7 +11,7 @@ from pathlib import Path
 from Node import Node
 from utils.parse_graph_file import parse_graph, save_graph
 from utils.constants import Directions as Dirs, Colors, Strategies
-from search import aStar
+from search import a_star
 
 
 class Graph:
@@ -43,9 +43,9 @@ class Graph:
             self.graph = self.extend_graph(position)
             self.shape = self.get_shape()
         # The Node can be added if the position is empty
-        if self.graph[position[0]][position[1]] is None:
-            neighbors = self.get_neighbors(position)
-            self.graph[position[0]][position[1]] = Node(position, neighbors)
+        if self.graph[position[0]][position[1]].is_obstacle:
+            self.graph[position[0]][position[1]].neighbors = self.get_neighbors(position)
+            self.graph[position[0]][position[1]].is_obstacle = False
             self.shape = self.get_shape()
 
     def add_edge(self, node1: Node, node2: Node, cost: int):
@@ -60,7 +60,7 @@ class Graph:
             warnings.warn(f"Nodes {node1.position} and {node2.position} are not neighbors.")
 
     def remove_node(self, position: Tuple[int, int]):
-        self.graph[position[0]][position[1]] = None
+        self.graph[position[0]][position[1]].is_obstacle = True
         self.clean()
 
     def solve(self, strategy: Strategies = Strategies.A_STAR) -> Optional[List[Node]]:
@@ -68,7 +68,15 @@ class Graph:
             warnings.warn("Start or objective node not set.")
             return
         if strategy == Strategies.A_STAR:
-            return aStar(self.start, self.objective)
+            path = a_star(self.start, self.objective)
+            # Reset the nodes
+            for row in self.graph:
+                for node in row:
+                    node.g = float("inf")
+                    node.h = 0
+                    node.f = 0
+                    node.parent = None
+            return path
         else:
             warnings.warn(f"Strategy {strategy} not implemented.")
             return
@@ -86,31 +94,33 @@ class Graph:
         text_to_save = ""
 
         for node in path:
-            text_to_save += f"({node.position[0]} {node.position[1]}) -> "
+            text_to_save += f"{node.position[0]} {node.position[1]}\n"
 
-        text_to_save = text_to_save[:-4]
+        # Create folder if it doesn't exist
+        Path("solutions").mkdir(parents=True, exist_ok=True)
 
         with open(f"solutions/sol_{file_name}.txt", "w") as f:
             f.write(text_to_save)
+            print(f"Solution saved in solutions/sol_{file_name}.txt")
 
     # Utils
     def extend_graph(self, position: Tuple[int, int]) -> List[List[Node]]:
         """Shift or add columns and lines to the graph to include the position."""
         if position[0] < 0:  # shift down
-            self.graph.insert(0, [None for _ in range(len(self.graph[0]))])
+            self.graph.insert(0, [Node((0, j)) for j in range(len(self.graph[0]))])
         if position[1] < 0:  # shift right
             for row in self.graph:
-                row.insert(0, None)
+                row.insert(0, Node((row[0].position[0], 0)))
         if position[0] >= len(self.graph):  # add row
-            self.graph.append([None for _ in range(len(self.graph[0]))])
+            self.graph.append([Node((position[0], j)) for j in range(len(self.graph[0]))])
         if position[1] >= len(self.graph[0]):  # add column
             for row in self.graph:
-                row.append(None)
+                row.append(Node((row[0].position[0], position[1])))
         return self.graph
 
     def clean(self):
         """Remove empty rows and columns from the graph."""
-        self.graph = [row for row in self.graph if any(node is not None for node in row)]
+        self.graph = [row for row in self.graph if any(not node.is_obstacle for node in row)]
         self.shape = self.get_shape()
 
     def get_neighbors(self, position: Tuple[int, int]) -> Dict[Tuple[int, int], Tuple[int, Node]]:
@@ -120,7 +130,7 @@ class Graph:
         maze_height, maze_width = self.shape
         for dx, dy in [Dirs.N, Dirs.S, Dirs.E, Dirs.W, Dirs.NE, Dirs.SE, Dirs.SW, Dirs.NW]:
             new_x, new_y = x + dx, y + dy
-            if 0 <= new_x < maze_height and 0 <= new_y < maze_width and self.graph[new_x][new_y] is not None:
+            if 0 <= new_x < maze_height and 0 <= new_y < maze_width and not self.graph[new_x][new_y].is_obstacle:
                 neighbors[(dx, dy)] = (1, self.graph[new_x][new_y])
         return neighbors
 
@@ -135,7 +145,7 @@ class Graph:
 
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
-                if self.graph[i][j] is not None:
+                if not self.graph[i][j].is_obstacle:
                     neighbors = self.get_neighbors((i, j))
                     node_id = i * self.shape[1] + j
                     for neighbor in neighbors:
@@ -165,12 +175,12 @@ class Graph:
                                 if color != "#1f78b4" and color_neighbor != "#1f78b4":
                                     edge_color = "red"
 
-                            nx_G.add_node(node_id, pos=(j,len(self.graph)-i), color=color)
+                            nx_G.add_node(node_id, pos=(j, len(self.graph)-i), color=color)
                             nx_G.add_node(neighbor_id, pos=(j + neighbor[1], len(self.graph) - (i + neighbor[0])), color=color_neighbor)
                             nx_G.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
 
         # Display the graph
-        fig = plt.figure(figsize=(len(self.graph[0])/2, len(self.graph)/2))
+        plt.figure(figsize=(len(self.graph[0])/2, len(self.graph)/2))
         node_color_map = nx.get_node_attributes(nx_G, 'color').values()
         edge_color_map = nx.get_edge_attributes(nx_G, 'color').values()
         pos = nx.get_node_attributes(nx_G, 'pos')
@@ -186,7 +196,7 @@ class Graph:
         # Display
         for i in range(len(img)):
             for j in range(len(img[0])):
-                if self.graph[i][j] is None:
+                if self.graph[i][j].is_obstacle:
                     img[i][j] = Colors.BLACK_COLOR
                 elif self.graph[i][j] == self.start:
                     img[i][j] = Colors.START_COLOR
@@ -203,6 +213,8 @@ class Graph:
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (len(self.graph[0]) * 50, len(self.graph) * 50), interpolation=cv2.INTER_NEAREST)
+        while len(img) > 1000 or len(img[0]) > 1900:
+            img = cv2.resize(img, (len(img[0]) // 2, len(img) // 2), interpolation=cv2.INTER_NEAREST)
 
         cv2.imshow("Graph", img)
         key = cv2.waitKey(10)

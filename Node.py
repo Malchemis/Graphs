@@ -10,7 +10,7 @@ class Node:
 
     def __init__(self, position: Tuple[int, int],
                  neighbors: Optional[Dict[Tuple[int, int], Tuple[int, Any]]] = None,
-                 parent: Optional['Node'] = None):
+                 parent: Optional['Node'] = None, is_obstacle: bool = False):
         """
         :param neighbors: dictionary with keys as directions and values as cost
         :param parent: the parent node. Optional, used for path reconstruction
@@ -19,9 +19,10 @@ class Node:
         self.parent = parent
         self.position = position
         self.neighbors = neighbors
-        self.g = 0
+        self.g = float('inf')
         self.h = 0
         self.f = 0
+        self.is_obstacle = is_obstacle
 
     def add_neighbor(self, node_neighbor: 'Node', cost: int):
         direction = (node_neighbor.position[0] - self.position[0], node_neighbor.position[1] - self.position[1])
@@ -39,9 +40,6 @@ class Node:
 
     def __str__(self) -> str:
         neighbors_directions = []
-        try :
-            for direction, neighbor in self.neighbors.items():
-                neighbors_directions.append(f'{get_direction(direction)}: {neighbor[0]}')
-        except:
-            pass
-        return f'Node at {self.position}, neighbors: {neighbors_directions}'
+        for direction, neighbor in self.neighbors.items():
+            neighbors_directions.append(f'{get_direction(direction)}: {neighbor[0]}')
+        return f'Node at {self.position}, neighbors: {neighbors_directions}, obstacle: {self.is_obstacle}'

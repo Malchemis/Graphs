@@ -11,7 +11,7 @@ from pathlib import Path
 from Node import Node
 from utils.parse_graph_file import parse_graph
 from utils.constants import Directions as Dirs, Colors, Strategies
-from search import a_star
+from search import a_star, cplex_solver
 
 
 class Graph:
@@ -68,7 +68,7 @@ class Graph:
         if self.start is None or self.objective is None:
             warnings.warn("Start or objective node not set.")
             return
-        if strategy in self.implemented:
+        if strategy == Strategies.A_STAR:
             path = a_star(self.start, self.objective)
             # Reset the nodes
             for row in self.graph:
@@ -77,10 +77,12 @@ class Graph:
                     node.h = 0
                     node.f = 0
                     node.parent = None
-            return path
+        elif strategy == Strategies.CPLEX:
+            path = cplex_solver(self, self.start, self.objective)
         else:
             warnings.warn(f"Strategy {strategy} not implemented.")
             return
+        return path
 
     def solve_and_save(self, strategy: Strategies = Strategies.A_STAR):
         if self.file_path is None:
@@ -134,6 +136,17 @@ class Graph:
             if 0 <= new_x < maze_height and 0 <= new_y < maze_width and not self.graph[new_x][new_y].is_obstacle:
                 neighbors[(dx, dy)] = (1, self.graph[new_x][new_y])
         return neighbors
+
+    def get_edges(self):
+        edges = []
+        for i in range(self.shape[0]):
+            for j in range(self.shape[1]):
+                if self.graph[i][j].is_obstacle:
+                    continue
+                neighbors = self.get_neighbors((i, j))
+                for neighbor in neighbors:
+                    edges.append((self.graph[i][j], neighbors[neighbor][1], neighbors[neighbor][0]))
+        return edges
 
     def display_network(self, path: Optional[List[Node]] = None):
         """

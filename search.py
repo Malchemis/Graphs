@@ -4,9 +4,11 @@ A* Pathfinding algorithm implementation
 
 from typing import List, Optional
 import heapq
+from cplex import Cplex
+from docplex.mp.model import Model
+
 from Node import Node
 from utils.distances import manhattan, euclidean
-import mip
 
 
 def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
@@ -86,42 +88,44 @@ def heuristic(node: Node, end_node: Node) -> float:
 
 
 def cplex_solver(graph, start_node, end_node):
-    model = mip.Model()
-    # Create variables for each potential edge in the graph
-    edge_vars = {}
-    for i in range(len(graph)):
-        for j in range(len(graph[i])):
-            node = graph[i][j]
-            if node.is_obstacle:
-                continue
-            for direction, (cost, neighbor) in node.neighbors.items():
-                if (node, neighbor) not in edge_vars and (neighbor, node) not in edge_vars:
-                    edge_vars[(node, neighbor)] = model.add_var(var_type=mip.BINARY)
+    model = Model("Pathfinding")
+    edges = graph.get_edges()
 
-    # Objective function: Minimize total cost of the path
-    model.objective = mip.xsum(edge_vars[edge] * edge[0].neighbors[(edge[1].position[0] - edge[0].position[0], edge[1].position[1] - edge[0].position[1])][0] for edge in edge_vars)
+    # Variables
+    x = model.binary_var_dict(edges, name="x")
+
+    # Objective function
+    model.minimize(model.sum(
+        edge[2] * x[edge] for edge in edges
+    ))
 
     # Constraints
-    # Each node (except start and end) should have exactly two adjacent edges selected
-    for i in range(len(graph)):
-        for j in range(len(graph[i])):
-            node = graph[i][j]
-            if node.is_obstacle or node == graph.start or node == graph.objective:
-                continue
-            model += (mip.xsum(edge_vars[(node, neighbor)] for direction, (cost, neighbor) in node.neighbors.items() if (node, neighbor) in edge_vars or (neighbor, node) in edge_vars) == 2)
+    # Each node has exactly one outgoing edge
+    for edge in edges:
+        model.add_constraint(
+            model.sum(x[(i, j, cost)] for i, j, cost in edges if i == edge[0]) == 1
+        )
 
-    # Start and end nodes
-    if graph.start:
-        model += (mip.xsum(edge_vars[(graph.start, neighbor)] for direction, (cost, neighbor) in graph.start.neighbors.items() if (graph.start, neighbor) in edge_vars) == 1)
-    if graph.objective:
-        model += (mip.xsum(edge_vars[(graph.objective, neighbor)] for direction, (cost, neighbor) in graph.objective.neighbors.items() if (graph.objective, neighbor) in edge_vars) == 1)
+    # Each node has exactly one incoming edge
+    for edge in edges:
+        model.add_constraint(
+            model.sum(x[(i, j, cost)] for i, j, cost in edges if j == edge[1]) == 1
+        )
 
-    # Solve the model
-    model.optimize()
+    # Start node has one outgoing edge
+    for j, cost in graph.get_neighbors(start_node.position):
+        print(f"Start node: {start_node.position} -> {j} with cost {cost}")
+        model.add_constraint(x[(start_node, j, cost)] == 1)
 
-    # Retrieve the solution
-    if model.num_solutions:
-        path_edges = [edge for edge in edge_vars if edge_vars[edge].x >= 0.99]
-        return path_edges
-    else:
-        return None
+    model.add_constraint(
+        model.sum(x[(start_node, j, cost)] for j, cost in graph.get_neighbors(start_node.position)) == 1
+    )
+
+    # End node has one incoming edge
+    model.add_constraint(
+        model.sum(x[(i, end_node, cost)] for i, cost in graph.get_neighbors(end_node.position)) == 1
+    )
+
+
+    model.solve()
+    print(model.solution)

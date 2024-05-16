@@ -1,13 +1,9 @@
 from typing import Optional, Tuple, Dict, Any
 
-from utils.constants import get_direction
-
-
 class Node:
     """
-    A node class for A* Pathfinding and Graph search
+    A node class for A* Pathfinding and CPLEX Graph search
     """
-
     def __init__(self, position: Tuple[int, int],
                  neighbors: Optional[Dict[Tuple[int, int], Tuple[int, Any]]] = None,
                  parent: Optional['Node'] = None, is_obstacle: bool = False):
@@ -39,7 +35,7 @@ class Node:
         return hash(self.position)
 
     def __str__(self) -> str:
-        neighbors_directions = []
-        for direction, neighbor in self.neighbors.items():
-            neighbors_directions.append(f'{get_direction(direction)}: {neighbor[0]}')
-        return f'Node at {self.position}, neighbors: {neighbors_directions}, obstacle: {self.is_obstacle}'
+        return f'({self.position[0]}, {self.position[1]})' if not self.is_obstacle else 'WALL'
+
+    def __repr__(self) -> str:
+        return self.__str__()

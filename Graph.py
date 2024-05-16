@@ -145,7 +145,7 @@ class Graph:
                     continue
                 neighbors = self.get_neighbors((i, j))
                 for neighbor in neighbors:
-                    edges.append((self.graph[i][j], neighbors[neighbor][1], neighbors[neighbor][0]))
+                    edges.append((self.graph[i][j], neighbors[neighbor][1]))
         return edges
 
     def display_network(self, path: Optional[List[Node]] = None):

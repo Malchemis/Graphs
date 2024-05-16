@@ -6,6 +6,8 @@ Pathfinding algorithms :
 
 from typing import List, Optional
 import heapq
+
+import cplex
 from docplex.mp.model import Model
 
 from Node import Node
@@ -91,39 +93,56 @@ def heuristic(node: Node, end_node: Node) -> float:
 def cplex_solver(graph, start_node, end_node):
     model = Model("Pathfinding")
     edges = graph.get_edges()
+    print("Edges:", edges)
 
     # Variables for each edge: 1 if edge is used, 0 otherwise
     x = {e: model.binary_var(name=f"x_{e[0].position}_{e[1].position}") for e in edges}
 
     # Objective: Minimize the sum of the costs of the edges included in the path
-    model.minimize(model.sum(x[e] * e[2] for e in edges))
+    model.minimize(model.sum(x[e] for e in edges))
 
     # Constraints
     # Ensure exactly one outgoing edge from start and one incoming edge to end
     model.add_constraint(
-        model.sum(x[(start_node, neighbor[1], neighbor[0])] for neighbor in start_node.neighbors.values()
-                  if (start_node, neighbor[1], neighbor[0]) in x) == 1
+        model.sum(x[(start_node, neighbor[1])] for neighbor in start_node.neighbors.values()
+                  if (start_node, neighbor[1]) in x) == 1
     )
     model.add_constraint(
-        model.sum(x[(neighbor[1], end_node, neighbor[0])] for neighbor in end_node.neighbors.values()
-                  if (neighbor[1], end_node, neighbor[0]) in x) == 1
+        model.sum(x[(neighbor[1], end_node)] for neighbor in end_node.neighbors.values()
+                  if (neighbor[1], end_node) in x) == 1
     )
 
-    # Flow conservation: Incoming edges == outgoing edges for all nodes except start and end
+    # Connectivity constraints
     for row in graph:
         for node in row:
-            if node != start_node and node != end_node:
-                in_edges = model.sum(x[(prev, node)] for prev, _ in node.neighbors.values() if (prev, node) in x)
-                out_edges = model.sum(x[(node, _next)] for _, _next in node.neighbors.values() if (node, _next) in x)
-                model.add_constraint(in_edges == out_edges)
+            if node == start_node or node == end_node:
+                continue
+            model.add_constraint(
+                model.sum(x[(node, neighbor[1])] for neighbor in node.neighbors.values()
+                          if (node, neighbor[1]) in x) ==
+                model.sum(x[(neighbor[1], node)] for neighbor in node.neighbors.values()
+                            if (neighbor[1], node) in x))
+
+    # No sub-tours
+    for row in graph:
+        for node in row:
+            if node.is_obstacle or node == start_node or node == end_node:
+                continue
+            for neighbor in node.neighbors.values():
+                if (node, neighbor[1]) in x:
+                    model.add_constraint(x[(node, neighbor[1])] +
+                                         x[(neighbor[1], node)] <= 1)
+
 
     solution = model.solve()
     if solution:
+        path = []
         print("\nPath found with total cost:", model.objective_value)
         for e in x:
             if x[e].solution_value > 0.5:
                 print(f"{e[0].position} -> {e[1].position}")
-        return solution
+                path.append(e[0])
+        return path
     else:
         print("No solution found")
         return None

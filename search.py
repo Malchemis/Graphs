@@ -37,7 +37,7 @@ def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
             if neighbor is None:
                 continue
 
-            tentative_g = current_node.g + euclidean(current_node, neighbor)  # Distance from start to neighbor
+            tentative_g = current_node.g + distance(current_node, neighbor)  # Distance from start to neighbor
             if tentative_g < neighbor.g:
                 neighbor.parent = current_node
                 neighbor.g = tentative_g
@@ -60,14 +60,16 @@ def reconstruct_path(node):
     return path[::-1]
 
 
-def euclidean(node1: Node, node2: Node) -> float:
+def distance(node1: Node, node2: Node) -> float:
     """
-    Euclidean distance between two nodes
+    Distance between two nodes
     :param node1: node 1
     :param node2: node 2
-    :return: euclidean distance between the two nodes
+    :return: distance between the two nodes
     """
-    return ((node1.position[0] - node2.position[0]) ** 2 + (node1.position[1] - node2.position[1]) ** 2) ** 0.5
+    # Manhattan / Euclidean distance
+    # return euclidean(node1, node2)
+    return manhattan(node1, node2)
 
 
 def heuristic(node: Node, end_node: Node) -> float:
@@ -79,3 +81,23 @@ def heuristic(node: Node, end_node: Node) -> float:
     """
     # We could use the Manhattan distance instead. For our case, the Euclidian distance is better
     return euclidean(node, end_node)
+
+
+def manhattan(node1: Node, node2: Node) -> float:
+    """
+    Manhattan distance between two nodes
+    :param node1: node 1
+    :param node2: node 2
+    :return: manhattan distance between the two nodes
+    """
+    return abs(node1.position[0] - node2.position[0]) + abs(node1.position[1] - node2.position[1])
+
+
+def euclidean(node1: Node, node2: Node) -> float:
+    """
+    Euclidean distance between two nodes
+    :param node1: node 1
+    :param node2: node 2
+    :return: euclidean distance between the two nodes
+    """
+    return ((node1.position[0] - node2.position[0]) ** 2 + (node1.position[1] - node2.position[1]) ** 2) ** 0.5

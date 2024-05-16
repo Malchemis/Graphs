@@ -9,7 +9,7 @@ from typing import Optional, Tuple, List, Dict
 from pathlib import Path
 
 from Node import Node
-from utils.parse_graph_file import parse_graph, save_graph
+from utils.parse_graph_file import parse_graph
 from utils.constants import Directions as Dirs, Colors, Strategies
 from search import a_star
 
@@ -29,6 +29,7 @@ class Graph:
         if file_path:
             self.start, self.objective, self.graph = parse_graph(Path(file_path))
             self.shape = self.get_shape()
+        self.implemented = [Strategies.A_STAR, Strategies.CPLEX]
 
     def set_start(self, node: Node):
         self.start = node
@@ -67,7 +68,7 @@ class Graph:
         if self.start is None or self.objective is None:
             warnings.warn("Start or objective node not set.")
             return
-        if strategy == Strategies.A_STAR:
+        if strategy in self.implemented:
             path = a_star(self.start, self.objective)
             # Reset the nodes
             for row in self.graph:
@@ -103,7 +104,7 @@ class Graph:
             f.write(text_to_save)
             print(f"Solution saved in solutions/sol_{file_name}.txt")
 
-    # Utils
+    # -- Utils --
     def extend_graph(self, position: Tuple[int, int]) -> List[List[Node]]:
         """Shift or add columns and lines to the graph to include the position."""
         if position[0] < 0:  # shift down
@@ -139,45 +140,45 @@ class Graph:
         Display the graph as a networkx graph.
         :return: weighted graph (nx graph)
         """
-
         # Convert the graph to a networkx graph
         nx_G = nx.Graph()
-
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
-                if not self.graph[i][j].is_obstacle:
-                    neighbors = self.get_neighbors((i, j))
-                    node_id = i * self.shape[1] + j
-                    for neighbor in neighbors:
-                        neighbor_id = (i + neighbor[0]) * self.shape[1] + j + neighbor[1]
-                        # Add nodes
-                        if not nx_G.has_edge(neighbor_id, node_id):
-                            # Find color
-                            color = "#1f78b4"
-                            color_neighbor = "#1f78b4"
-                            edge_color = "black"
-                            if path is not None:
-                                # Path color
-                                if self.graph[i][j] in path:
-                                    if self.graph[i][j] == self.start:
-                                        color = "#029f00"
-                                    elif self.graph[i][j] == self.objective:
-                                        color = "#4a78ff"
-                                    else:
-                                        color = "red"
-                                if self.graph[i + neighbor[0]][j + neighbor[1]] in path:
-                                    if self.graph[i + neighbor[0]][j + neighbor[1]] == self.start:
-                                        color_neighbor = "#029f00"
-                                    elif self.graph[i + neighbor[0]][j + neighbor[1]] == self.objective:
-                                        color_neighbor = "#4a78ff"
-                                    else:
-                                        color_neighbor = "red"
-                                if color != "#1f78b4" and color_neighbor != "#1f78b4":
-                                    edge_color = "red"
+                if self.graph[i][j].is_obstacle:
+                    continue
+                neighbors = self.get_neighbors((i, j))
+                node_id = i * self.shape[1] + j
+                for neighbor in neighbors:
+                    neighbor_id = (i + neighbor[0]) * self.shape[1] + j + neighbor[1]
+                    # Add nodes
+                    if nx_G.has_edge(neighbor_id, node_id):
+                        continue
+                    # Find color
+                    color = "#1f78b4"
+                    color_neighbor = "#1f78b4"
+                    edge_color = "black"
+                    if path is not None:
+                        # Path color
+                        if self.graph[i][j] in path:
+                            if self.graph[i][j] == self.start:
+                                color = "#029f00"
+                            elif self.graph[i][j] == self.objective:
+                                color = "#4a78ff"
+                            else:
+                                color = "red"
+                        if self.graph[i + neighbor[0]][j + neighbor[1]] in path:
+                            if self.graph[i + neighbor[0]][j + neighbor[1]] == self.start:
+                                color_neighbor = "#029f00"
+                            elif self.graph[i + neighbor[0]][j + neighbor[1]] == self.objective:
+                                color_neighbor = "#4a78ff"
+                            else:
+                                color_neighbor = "red"
+                        if color != "#1f78b4" and color_neighbor != "#1f78b4":
+                            edge_color = "red"
 
-                            nx_G.add_node(node_id, pos=(j, len(self.graph)-i), color=color)
-                            nx_G.add_node(neighbor_id, pos=(j + neighbor[1], len(self.graph) - (i + neighbor[0])), color=color_neighbor)
-                            nx_G.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
+                    nx_G.add_node(node_id, pos=(j, len(self.graph)-i), color=color)
+                    nx_G.add_node(neighbor_id, pos=(j + neighbor[1], len(self.graph) - (i + neighbor[0])), color=color_neighbor)
+                    nx_G.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
 
         # Display the graph
         plt.figure(figsize=(len(self.graph[0])/2, len(self.graph)/2))
@@ -224,9 +225,6 @@ class Graph:
             key = cv2.waitKey(10)
         cv2.destroyAllWindows()
         return
-
-    def save(self, file_path: str):
-        save_graph(self.graph, Path(file_path))
 
     def get_shape(self):
         return len(self.graph), len(self.graph[0])

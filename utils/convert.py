@@ -32,4 +32,3 @@ def convert_to_node_graph(graph: np.ndarray):
             elif graph[i][j] == Values.OBJECTIVE:
                 end_node = node_graph[i][j]
     return start_node, end_node, node_graph
-

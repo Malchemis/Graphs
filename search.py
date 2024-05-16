@@ -5,6 +5,8 @@ A* Pathfinding algorithm implementation
 from typing import List, Optional
 import heapq
 from Node import Node
+from utils.distances import manhattan, euclidean
+import mip
 
 
 def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
@@ -83,21 +85,43 @@ def heuristic(node: Node, end_node: Node) -> float:
     return euclidean(node, end_node)
 
 
-def manhattan(node1: Node, node2: Node) -> float:
-    """
-    Manhattan distance between two nodes
-    :param node1: node 1
-    :param node2: node 2
-    :return: manhattan distance between the two nodes
-    """
-    return abs(node1.position[0] - node2.position[0]) + abs(node1.position[1] - node2.position[1])
+def cplex_solver(graph, start_node, end_node):
+    model = mip.Model()
+    # Create variables for each potential edge in the graph
+    edge_vars = {}
+    for i in range(len(graph)):
+        for j in range(len(graph[i])):
+            node = graph[i][j]
+            if node.is_obstacle:
+                continue
+            for direction, (cost, neighbor) in node.neighbors.items():
+                if (node, neighbor) not in edge_vars and (neighbor, node) not in edge_vars:
+                    edge_vars[(node, neighbor)] = model.add_var(var_type=mip.BINARY)
 
+    # Objective function: Minimize total cost of the path
+    model.objective = mip.xsum(edge_vars[edge] * edge[0].neighbors[(edge[1].position[0] - edge[0].position[0], edge[1].position[1] - edge[0].position[1])][0] for edge in edge_vars)
 
-def euclidean(node1: Node, node2: Node) -> float:
-    """
-    Euclidean distance between two nodes
-    :param node1: node 1
-    :param node2: node 2
-    :return: euclidean distance between the two nodes
-    """
-    return ((node1.position[0] - node2.position[0]) ** 2 + (node1.position[1] - node2.position[1]) ** 2) ** 0.5
+    # Constraints
+    # Each node (except start and end) should have exactly two adjacent edges selected
+    for i in range(len(graph)):
+        for j in range(len(graph[i])):
+            node = graph[i][j]
+            if node.is_obstacle or node == graph.start or node == graph.objective:
+                continue
+            model += (mip.xsum(edge_vars[(node, neighbor)] for direction, (cost, neighbor) in node.neighbors.items() if (node, neighbor) in edge_vars or (neighbor, node) in edge_vars) == 2)
+
+    # Start and end nodes
+    if graph.start:
+        model += (mip.xsum(edge_vars[(graph.start, neighbor)] for direction, (cost, neighbor) in graph.start.neighbors.items() if (graph.start, neighbor) in edge_vars) == 1)
+    if graph.objective:
+        model += (mip.xsum(edge_vars[(graph.objective, neighbor)] for direction, (cost, neighbor) in graph.objective.neighbors.items() if (graph.objective, neighbor) in edge_vars) == 1)
+
+    # Solve the model
+    model.optimize()
+
+    # Retrieve the solution
+    if model.num_solutions:
+        path_edges = [edge for edge in edge_vars if edge_vars[edge].x >= 0.99]
+        return path_edges
+    else:
+        return None

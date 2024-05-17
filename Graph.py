@@ -120,10 +120,6 @@ class Graph:
             raise ValueError("Couldn't save the solution: File path not set.")
         path = self.solve(strategy)
 
-        if path is None:
-            print("Couldn't save the solution: No path found.")
-            return
-
         file_name = self.file_path.split("/")[-1].split(".")[0]
         text_to_save = ""
 
@@ -195,48 +191,49 @@ class Graph:
         Display the graph as a networkx graph.
         :return: weighted graph (nx graph)
         """
-        nx_G = None
+        nx_graph = None
         if self.problem == Problems.SHORTEST_PATH:
-            nx_G = self.display_network_shortest_path(path)
+            nx_graph = self.display_network_shortest_path(path)
         elif self.problem == Problems.TSP:
-            nx_G = self.display_network_tsp(path)
-        if nx_G:
-            node_color_map = nx.get_node_attributes(nx_G, 'color').values()
-            edge_color_map = nx.get_edge_attributes(nx_G, 'color').values()
-            pos = nx.get_node_attributes(nx_G, 'pos')
-            nx.draw_networkx(nx_G, with_labels=False, pos=pos, node_color=node_color_map, edge_color=edge_color_map)
-            nx.draw_networkx_labels(nx_G, pos, font_size=10, font_color='white')
+            nx_graph = self.display_network_tsp(path)
+        if nx_graph:
+            node_color_map = nx.get_node_attributes(nx_graph, 'color').values()
+            edge_color_map = nx.get_edge_attributes(nx_graph, 'color').values()
+            pos = nx.get_node_attributes(nx_graph, 'pos')
+            nx.draw_networkx(nx_graph, with_labels=False, pos=pos, node_color=node_color_map, edge_color=edge_color_map)
+            nx.draw_networkx_labels(nx_graph, pos, font_color="white")
+            nx.draw_networkx_edge_labels(nx_graph, pos, edge_labels=nx.get_edge_attributes(nx_graph, 'weight'))
             plt.show()
         else:
             raise ValueError("Problem not set.")
 
     def display_network_tsp(self, path: Optional[List[Node]] = None):
         # Convert the graph to a networkx graph
-        nx_G = nx.Graph()
+        nx_graph = nx.Graph()
         for i in range(len(self.node_list)):
             node_id = i
             # Set their position in a circle
             pos_i = (math.cos(2 * math.pi * i / len(self.node_list)), math.sin(2 * math.pi * i / len(self.node_list)))
-            nx_G.add_node(node_id, pos=pos_i, color="#1f78b4")
+            nx_graph.add_node(node_id, pos=pos_i, color="#1f78b4")
 
-            for j in range(i + 1, len(self.node_list)):
-                neighbor_id = j
-                if nx_G.has_edge(neighbor_id, node_id):
-                    continue
+        # Add indexes in path order as edges
+        if path is not None:
+            for i in range(len(path) - 1):
+                nx_graph.add_edge(self.node_list.index(path[i]), self.node_list.index(path[i + 1]),
+                                  weight=path.index(path[i]) + 1, color="red")
 
-                pos_neighbor = (math.cos(2 * math.pi * j / len(self.node_list)), math.sin(2 * math.pi * j / len(self.node_list)))
-                nx_G.add_node(neighbor_id, pos=pos_neighbor, color="#1f78b4")
-
-                if (node_id, neighbor_id) in self.cost:
-                    nx_G.add_edge(node_id, neighbor_id, weight=self.cost[(self.node_list[i], self.node_list[j])], color="black")
+        # # Add edges with their cost
+        #     for j in range(i + 1, len(self.node_list)):
+        #         if (self.node_list[i], self.node_list[j]) in self.cost:
+        #             nx_graph.add_edge(i, j, weight=self.cost[(self.node_list[i], self.node_list[j])], color="black")
 
         # Display the graph
         plt.figure(figsize=(len(self.node_list)/2, len(self.node_list)/2))
-        return nx_G
+        return nx_graph
 
     def display_network_shortest_path(self, path: Optional[List[Node]] = None):
         # Convert the graph to a networkx graph
-        nx_G = nx.Graph()
+        nx_graph = nx.Graph()
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
                 if self.graph[i][j].is_obstacle:
@@ -246,7 +243,7 @@ class Graph:
                 for neighbor in neighbors:
                     neighbor_id = (i + neighbor[0]) * self.shape[1] + j + neighbor[1]
                     # Add nodes
-                    if nx_G.has_edge(neighbor_id, node_id):
+                    if nx_graph.has_edge(neighbor_id, node_id):
                         continue
                     # Find color
                     color = "#1f78b4"
@@ -271,13 +268,13 @@ class Graph:
                         if color != "#1f78b4" and color_neighbor != "#1f78b4":
                             edge_color = "red"
 
-                    nx_G.add_node(node_id, pos=(j, len(self.graph)-i), color=color)
-                    nx_G.add_node(neighbor_id, pos=(j + neighbor[1], len(self.graph) - (i + neighbor[0])), color=color_neighbor)
-                    nx_G.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
+                    nx_graph.add_node(node_id, pos=(j, len(self.graph)-i), color=color)
+                    nx_graph.add_node(neighbor_id, pos=(j + neighbor[1], len(self.graph) - (i + neighbor[0])), color=color_neighbor)
+                    nx_graph.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
 
         # Display the graph
         plt.figure(figsize=(len(self.graph[0])/2, len(self.graph)/2))
-        return nx_G
+        return nx_graph
 
     def display(self, path: Optional[List[Node]] = None):
         """Display the graph in a window. Press 'q' to close."""

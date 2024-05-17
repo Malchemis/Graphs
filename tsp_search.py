@@ -5,9 +5,8 @@ Traveling Salesman Problem (TSP) search algorithms
 """
 
 from typing import List, Optional
-import time
-from docplex.mp.model import Model
 
+from docplex.mp.model import Model
 from itertools import permutations
 
 
@@ -23,30 +22,28 @@ def brute_force(graph) -> tuple:
     min_cost = float('inf')
     best_route = []
 
-    # Generate all possible routes that start and end at the first node in the list
-    for perm in permutations(nodes[1:]):
-        # Start at the first node and add it to the end to complete the circuit
-        route = (nodes[0],) + perm + (nodes[0],)
+    # Generate all possible routes that start and end from any node
+    for starting_ending_point in nodes:
+        # get all permutations of the nodes but the starting and ending point
+        for perm in permutations([node for node in nodes if node != starting_ending_point]):
+            route = (starting_ending_point,) + perm + (starting_ending_point,)
 
-        # Calculate the total cost of this route
-        current_cost = 0
-        valid_route = True
-        for i in range(len(route) - 1):
-            if (route[i], route[i + 1]) in costs:
-                current_cost += costs[(route[i], route[i + 1])]
-            else:
-                valid_route = False
-                break
+            # Calculate the total cost of this route
+            current_cost = 0
+            valid_route = True
+            for i in range(len(route) - 1):
+                if (route[i], route[i + 1]) in costs:
+                    current_cost += costs[(route[i], route[i + 1])]
+                else:
+                    valid_route = False
+                    break
 
-        print(f"Route: {route} - Cost: {current_cost}")
+            # Check if this route is cheaper and valid
+            if valid_route and current_cost < min_cost:
+                min_cost = current_cost
+                best_route = route
 
-        # Check if this route is cheaper and valid
-        if valid_route and current_cost < min_cost:
-            print(f"New best route: {route} - Cost: {current_cost}")
-            min_cost = current_cost
-            best_route = route
-
-    return best_route, min_cost
+    return best_route
 
 
 def tsp_cplex_solver(graph) -> Optional[List]:

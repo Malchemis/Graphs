@@ -1,11 +1,12 @@
 from Graph import Graph
 from utils.constants import Strategies, Problems
 from utils.display import display_cv2, display_network
+from utils.generation import gen_tsp
 from tqdm import tqdm
 import time
 
 
-def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, file_path="examples/reseau_50_50_1.txt", display=False, verbose=False,
+def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, file_path="examples/reseau_50_50_1.txt", display=True, verbose=False,
          save=False):
     """Create a graph from the given file and display it."""
     graph = Graph(file_path, problem)
@@ -39,6 +40,6 @@ def compare_shortest_path_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_
 
 
 if __name__ == '__main__':
-    # main(verbose=True, problem=Problems.TSP, algo=Strategies.CPLEX, n_iter=1, display=True, save=True,
-    #      file_path="examples/tsp1.txt")
-    compare_shortest_path_algo(n_iter=100, file_path="examples/tsp1.txt", problem=Problems.TSP)
+    gen_tsp(30, .2)
+    main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=1, display=True, save=True,
+    file_path="examples/tsp.txt")

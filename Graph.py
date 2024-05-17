@@ -119,6 +119,10 @@ class Graph:
         file_name = self.file_path.split("/")[-1].split(".")[0]
         text_to_save = ""
 
+        if path is None:
+            print("No path found.")
+            return
+
         for node in path:
             if self.problem == Problems.SHORTEST_PATH:
                 text_to_save += f"{node.position[0]} {node.position[1]}\n"

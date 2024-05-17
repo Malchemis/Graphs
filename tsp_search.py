@@ -81,11 +81,7 @@ def tsp_cplex_solver(graph) -> Optional[List]:
 
     # Check if a solution exists
     if solution:
-        print("Solution found:")
         edges = [(i, j) for i, j in x if x[i, j].solution_value > 0.5]
-        print("Edges in the tour:", edges)
-        print("Path", path := [edge[0] for edge in edges])
-        return path + [edges[-1][1]]
+        return [edge[0] for edge in edges] + [edges[-1][1]]
     else:
-        print("No solution exists.")
         return None

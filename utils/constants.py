@@ -59,3 +59,15 @@ class Colors:
 class Strategies:
     A_STAR = "astar"
     CPLEX = "cplex"
+    BRUTE_FORCE = "brute_force"
+
+    def __init__(self):
+        pass
+
+
+class Problems:
+    TSP = "tsp"
+    SHORTEST_PATH = "shortest_path"
+
+    def __init__(self):
+        pass

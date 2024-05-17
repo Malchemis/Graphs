@@ -3,5 +3,5 @@ networkx
 matplotlib
 numpy
 tqdm
-docplex
-cplex
+# docplex # To install using CPLEX Studio
+# cplex # To install using CPLEX Studio

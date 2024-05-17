@@ -1,5 +1,6 @@
 from typing import Optional, Tuple, Dict, Any
 
+
 class Node:
     """
     A node class for A* Pathfinding and CPLEX Graph search

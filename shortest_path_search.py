@@ -89,10 +89,10 @@ def heuristic(node: Node, end_node: Node) -> float:
     return euclidean(node, end_node)
 
 
-def cplex_solver(graph, start_node, end_node):
+def shortest_path_cplex_solver(graph, start_node, end_node):
     model = Model("Pathfinding")
     edges = graph.get_edges()
-    
+
     # Variables for each edge: 1 if edge is used, 0 otherwise
     x = {e: model.binary_var(name=f"x_{e[0].position}_{e[1].position}") for e in edges}
 
@@ -119,7 +119,7 @@ def cplex_solver(graph, start_node, end_node):
                 model.sum(x[(node, neighbor[1])] for neighbor in node.neighbors.values()
                           if (node, neighbor[1]) in x) ==
                 model.sum(x[(neighbor[1], node)] for neighbor in node.neighbors.values()
-                            if (neighbor[1], node) in x))
+                          if (neighbor[1], node) in x))
 
     # No sub-tours
     for row in graph:
@@ -131,16 +131,15 @@ def cplex_solver(graph, start_node, end_node):
                     model.add_constraint(x[(node, neighbor[1])] +
                                          x[(neighbor[1], node)] <= 1)
 
-
     solution = model.solve()
     if solution:
         path = []
-        print("\nPath found with total cost:", model.objective_value)
+        # print("\nPath found with total cost:", model.objective_value)
         for e in x:
             if x[e].solution_value > 0.5:
-                print(f"{e[0].position} -> {e[1].position}")
+                # print(f"{e[0].position} -> {e[1].position}")
                 path.append(e[0])
         return path
     else:
-        print("No solution found")
+        # print("No solution found")
         return None

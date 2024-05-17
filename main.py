@@ -1,5 +1,6 @@
 from Graph import Graph
 from utils.constants import Strategies, Problems
+from utils.display import display_cv2, display_network
 from tqdm import tqdm
 import time
 
@@ -18,8 +19,8 @@ def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, fil
         if verbose:
             print(f"Path: {path}")
         if display:
-            graph.display(path)
-            graph.display_network(path)
+            display_cv2(graph, path)
+            display_network(graph, path)
         if save:
             graph.solve_and_save(algo)
 
@@ -34,6 +35,6 @@ def compare_shortest_path_algo(n_iter=100, file_path="examples/reseau_50_50_1.tx
 
 
 if __name__ == '__main__':
-    main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=1, display=True, save=True,
+    main(verbose=True, problem=Problems.TSP, algo=Strategies.CPLEX, n_iter=1, display=True, save=True,
          file_path="examples/tsp1.txt")
     # compare_shortest_path_algo(n_iter=10, file_path="examples/reseau_50_50_1.txt")

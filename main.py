@@ -25,4 +25,4 @@ def main(n_iter=100, algo=Strategies.A_STAR, file_path="examples/reseau_50_50_1.
 
 
 if __name__ == '__main__':
-    main(verbose=True, algo=Strategies.CPLEX, n_iter=1, display=True, save=False, file_path="examples/reseau_20_20_1.txt")
+    main(verbose=True, algo=Strategies.CPLEX, n_iter=1, display=True, save=False, file_path="examples/reseau_50_50_1.txt")

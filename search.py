@@ -7,7 +7,6 @@ Pathfinding algorithms :
 from typing import List, Optional
 import heapq
 
-import cplex
 from docplex.mp.model import Model
 
 from Node import Node
@@ -93,8 +92,7 @@ def heuristic(node: Node, end_node: Node) -> float:
 def cplex_solver(graph, start_node, end_node):
     model = Model("Pathfinding")
     edges = graph.get_edges()
-    print("Edges:", edges)
-
+    
     # Variables for each edge: 1 if edge is used, 0 otherwise
     x = {e: model.binary_var(name=f"x_{e[0].position}_{e[1].position}") for e in edges}
 

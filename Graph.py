@@ -145,6 +145,8 @@ class Graph:
                     continue
                 neighbors = self.get_neighbors((i, j))
                 for neighbor in neighbors:
+                    if neighbors[neighbor][1].is_obstacle:
+                        continue
                     edges.append((self.graph[i][j], neighbors[neighbor][1]))
         return edges
 

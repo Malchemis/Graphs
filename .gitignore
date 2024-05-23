@@ -11,7 +11,8 @@ Report/main.synctex.gz
 Report/main.toc
 Report/main.fdb*
 Report/main.fls
-Report/ressources
+Report/main.bbl-SAVE-ERROR
+Report/main.bcf-SAVE-ERROR
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

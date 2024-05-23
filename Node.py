@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Tuple, Dict
 
 
 class Node:
@@ -6,7 +6,7 @@ class Node:
     A node class for A* Pathfinding and CPLEX Graph search
     """
     def __init__(self, position: Tuple[int, int],
-                 neighbors: Optional[Dict[Tuple[int, int], Tuple[int, Any]]] = None,
+                 neighbors: Optional[Dict[Tuple[int, int], 'Node']] = None,
                  parent: Optional['Node'] = None, is_obstacle: bool = False):
         """
         :param neighbors: dictionary with keys as directions and values as cost
@@ -16,15 +16,19 @@ class Node:
         self.parent = parent
         self.position = position
         self.neighbors = neighbors
+        if neighbors is None:
+            self.neighbors = {}
         self.g = float('inf')
         self.h = 0
         self.f = 0
         self.is_obstacle = is_obstacle
 
-    def add_neighbor(self, node_neighbor: 'Node', cost: int):
+    def add_neighbor(self, node_neighbor: 'Node'):
+        if node_neighbor.is_obstacle or self.is_obstacle or node_neighbor == self:
+            return
         direction = (node_neighbor.position[0] - self.position[0], node_neighbor.position[1] - self.position[1])
-        self.neighbors[direction] = (cost, node_neighbor)
-        node_neighbor.neighbors[(-direction[0], -direction[1])] = (cost, self)
+        self.neighbors[direction] = node_neighbor
+        node_neighbor.neighbors[(-direction[0], -direction[1])] = self
 
     def __eq__(self, other: 'Node') -> bool:
         return self.position == other.position

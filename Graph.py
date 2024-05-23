@@ -6,7 +6,8 @@ from pathlib import Path
 
 from Node import Node
 from utils.parse_graph_file import parse_graph, parse_tsp
-from utils.constants import Directions as Dirs, Colors, Strategies, Problems
+from utils.constants import Directions as Dirs, Algorithms, Problems
+from utils.distances import euclidean
 from shortest_path_search import a_star, shortest_path_cplex_solver
 from tsp_search import brute_force, tsp_cplex_solver
 
@@ -20,9 +21,9 @@ class Graph:
     def __init__(self, file_path: Optional[str] = None, problem: Optional[str] = None):
         self.start = None
         self.objective = None
-        self.graph = []  # List[List[Node]] if problem is shortest path
-        self.node_list = []  # List[Node] if problem is TSP
-        self.cost = {}   # Dict[Tuple[int, int], int] if problem is TSP
+        self.graph = []  # List[List[Node]] (mostly for shortest path)
+        self.node_list = []  # List[int] (mostly for TSP)
+        self.cost = {}   # Dict[Tuple[int, int], int] (for CPLEX)
         self.shape = (0, 0)
         self.file_path = file_path
         self.problem = problem
@@ -32,6 +33,7 @@ class Graph:
             elif problem == Problems.SHORTEST_PATH:
                 self.start, self.objective, self.graph = parse_graph(Path(file_path))
                 self.shape = self.get_shape()
+                self.cost = {edge: euclidean(edge[0], edge[1]) for edge in self.get_edges()}
 
     def set_start(self, node: Node):
         self.start = node
@@ -41,16 +43,18 @@ class Graph:
 
     # Graph operations and methods
     def add_node(self, position: Tuple[int, int] | int):
+        x, y = position
         if self.problem == Problems.SHORTEST_PATH:
             # The Graph needs to be extended if the position is out of bounds
-            if position[0] < 0 or position[0] >= len(self.graph) or position[1] < 0 or position[1] >= len(self.graph[0]):
-                self.graph = self.extend_graph(position)
-                self.shape = self.get_shape()
+            if x < 0 or x >= self.shape[0] or y < 0 or y >= self.shape[1]:
+                self.extend_graph(position)
+                self.shape = self.get_shape()   # Update the shape
             # The Node can be added if the position is empty
-            if self.graph[position[0]][position[1]].is_obstacle:
-                self.graph[position[0]][position[1]].neighbors = self.get_neighbors(position)
-                self.graph[position[0]][position[1]].is_obstacle = False
-                self.shape = self.get_shape()
+            if self.graph[x][y].is_obstacle:
+                for neighbor in self.get_neighbors(position).values():
+                    neighbor.add_neighbor(self.graph[x][y])
+                self.graph[x][y].is_obstacle = False
+                self.shape = self.get_shape()   # Update the shape
         elif self.problem == Problems.TSP:
             if position not in self.node_list:
                 self.node_list.append(position)
@@ -62,8 +66,9 @@ class Graph:
             if node2 not in self.graph:
                 self.add_node(node2.position)
             if abs(node1.position[0] - node2.position[0]) + abs(node1.position[1] - node2.position[1]) <= math.sqrt(2):
-                node1.add_neighbor(node2, cost)
-                node2.add_neighbor(node1, cost)
+                node1.add_neighbor(node1)
+                node2.add_neighbor(node2)
+                self.cost[(node1, node2)] = cost
             else:
                 warnings.warn(f"Nodes {node1.position} and {node2.position} are not neighbors.")
         elif self.problem == Problems.SHORTEST_PATH:
@@ -76,17 +81,20 @@ class Graph:
     def remove_node(self, position: Tuple[int, int] | int):
         if self.problem == Problems.SHORTEST_PATH:
             self.graph[position[0]][position[1]].is_obstacle = True
+            # disconnect the node from its neighbors
+            for neighbor in self.get_neighbors(position).values():
+                neighbor.neighbors.pop((neighbor.position[0] - position[0], neighbor.position[1] - position[1]))
             self.clean()
         elif self.problem == Problems.TSP:
             if position in self.node_list:
                 self.node_list.remove(position)
 
-    def solve(self, strategy: Strategies = Strategies.A_STAR) -> Optional[List[Node]]:
+    def solve(self, algo: Algorithms = Algorithms.A_STAR) -> Optional[List[Node]]:
         if self.problem == Problems.SHORTEST_PATH:
             if self.start is None or self.objective is None:
                 warnings.warn("Start or objective node not set.")
                 return
-            if strategy == Strategies.A_STAR:
+            if algo == Algorithms.A_STAR:
                 path = a_star(self.start, self.objective)
                 # Reset the nodes
                 for row in self.graph:
@@ -95,23 +103,23 @@ class Graph:
                         node.h = 0
                         node.f = 0
                         node.parent = None
-            elif strategy == Strategies.CPLEX:
+            elif algo == Algorithms.CPLEX:
                 path = shortest_path_cplex_solver(self, self.start, self.objective)
             else:
-                warnings.warn(f"Strategy {strategy} not implemented.")
+                warnings.warn(f"Algorithm {algo} not implemented.")
                 return
             return path
         elif self.problem == Problems.TSP:
-            if strategy == Strategies.BRUTE_FORCE:
+            if algo == Algorithms.BRUTE_FORCE:
                 path = brute_force(self)
-            elif strategy == Strategies.CPLEX:
+            elif algo == Algorithms.CPLEX:
                 path = tsp_cplex_solver(self)
             else:
-                warnings.warn(f"Strategy {strategy} not implemented.")
+                warnings.warn(f"Algorithm {algo} not implemented.")
                 return
             return path
 
-    def solve_and_save(self, strategy: Strategies = Strategies.A_STAR):
+    def solve_and_save(self, strategy: Algorithms = Algorithms.A_STAR):
         if self.file_path is None:
             raise ValueError("Couldn't save the solution: File path not set.")
         path = self.solve(strategy)
@@ -137,7 +145,7 @@ class Graph:
             print(f"Solution saved in solutions/sol_{file_name}.txt")
 
     # -- Utils --
-    def extend_graph(self, position: Tuple[int, int]) -> List[List[Node]]:
+    def extend_graph(self, position: Tuple[int, int]):
         """Shift or add columns and lines to the graph to include the position."""
         if position[0] < 0:  # shift down
             self.graph.insert(0, [Node((0, j)) for j in range(len(self.graph[0]))])
@@ -149,28 +157,22 @@ class Graph:
         if position[1] >= len(self.graph[0]):  # add column
             for row in self.graph:
                 row.append(Node((row[0].position[0], position[1])))
-        return self.graph
 
     def clean(self):
         """Remove empty rows and columns from the graph."""
         self.graph = [row for row in self.graph if any(not node.is_obstacle for node in row)]
         self.shape = self.get_shape()
 
-    def get_neighbors(self, position: Tuple[int, int]) -> Dict[Tuple[int, int], Tuple[int, Node]]:
-        """Return a neighbors for a given node."""
+    def get_neighbors(self, position: Tuple[int, int]) -> Dict[Tuple[int, int], Node]:
+        """Return a list of neighbors for a given node."""
         x, y = position
         neighbors = {}
         maze_height, maze_width = self.shape
-        # North, South, East, West
-        for dx, dy in [Dirs.N, Dirs.S, Dirs.E, Dirs.W]:
+
+        for dx, dy in [Dirs.N, Dirs.S, Dirs.E, Dirs.W, Dirs.NE, Dirs.SE, Dirs.SW, Dirs.NW]:
             new_x, new_y = x + dx, y + dy
             if 0 <= new_x < maze_height and 0 <= new_y < maze_width and not self.graph[new_x][new_y].is_obstacle:
-                neighbors[(dx, dy)] = (1, self.graph[new_x][new_y])
-        # North - East, South - East, South - West, North - West
-        for dx, dy in [Dirs.NE, Dirs.SE, Dirs.SW, Dirs.NW]:
-            new_x, new_y = x + dx, y + dy
-            if 0 <= new_x < maze_height and 0 <= new_y < maze_width and not self.graph[new_x][new_y].is_obstacle:
-                neighbors[(dx, dy)] = (math.sqrt(2), self.graph[new_x][new_y])
+                neighbors[(dx, dy)] = self.graph[new_x][new_y]
         return neighbors
 
     def get_edges(self):
@@ -181,9 +183,9 @@ class Graph:
                     continue
                 neighbors = self.get_neighbors((i, j))
                 for neighbor in neighbors:
-                    if neighbors[neighbor][1].is_obstacle:
+                    if neighbors[neighbor].is_obstacle:
                         continue
-                    edges.append((self.graph[i][j], neighbors[neighbor][1]))
+                    edges.append((self.graph[i][j], neighbors[neighbor]))
         return edges
 
     def get_shape(self):

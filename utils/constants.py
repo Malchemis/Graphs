@@ -56,7 +56,7 @@ class Colors:
         pass
 
 
-class Strategies:
+class Algorithms:
     A_STAR = "astar"
     CPLEX = "cplex"
     BRUTE_FORCE = "brute_force"

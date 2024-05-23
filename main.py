@@ -43,3 +43,4 @@ if __name__ == '__main__':
     gen_tsp(30, .2)
     main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=1, display=True, save=True,
     file_path="examples/tsp.txt")
+    # compare_shortest_path_algo(n_iter=100, file_path="examples/tsp1.txt", problem=Problems.TSP)

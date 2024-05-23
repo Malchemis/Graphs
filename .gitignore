@@ -1,3 +1,18 @@
+Report/main.aux
+Report/main.bcf
+Report/main.lof
+Report/main.log
+Report/main.lot
+Report/main.out
+Report/main.run.xml
+Report/main.bbl
+Report/main.blg
+Report/main.synctex.gz
+Report/main.toc
+Report/main.fdb*
+Report/main.fls
+Report/ressources
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -49,7 +64,6 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-cover/
 
 # Translations
 *.mo
@@ -160,3 +174,8 @@ cython_debug/
 .idea/
 solutions/
 venv/
+
+
+# Visual Studio Code
+.vscode/
+*.code-workspace

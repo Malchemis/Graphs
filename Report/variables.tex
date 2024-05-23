@@ -1,0 +1,30 @@
+% \newcommand{\addstudent}[4]{\textbf{#1} \\ #2 \\ #3 \\ \href{mailto:#3?subject=Regarding\projecttitle}{#4}\\}
+\newcommand{\addstudent}[1]{\textbf{#1} \\}
+\newcommand{\addtutor}[2]{#1 \\ #2\\}
+\newcommand{\addentity}[2]{\textbf{#1} & #2\\}
+\newcommand{\supervisor}{Raca TODOSIJEVIC - Associate Professor}
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+
+
+%=========================================================================
+
+% Complétez ici le titre de votre projet :
+\def\projecttitle{
+    Graphes et Optimisation : Recherche du plus court chemin et Problème du voyageur de commerce
+}
+% Complétez ici le titre de votre prénom et votre nom :
+\def\students{
+    % \addstudent{Elias BOULANGER}{INSA Hauts-de-France - ICY}{Université Polytechnique Hauts-de-France}{elias.boulanger@uphf.fr}
+    % \addstudent{Thomas AUBERT}{INSA Hauts-de-France - ICY}{Université Polytechnique}{thomas.aubert1@uphf.fr}
+    \addstudent{Elias BOULANGER}
+    \addstudent{Thomas AUBERT}
+}
+
+% Complétez ici votre département (décommentez la ligne correspondante) :
+\def\departement{
+    Département d'Informatique et de Cybersécurité
+}

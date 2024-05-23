@@ -1,0 +1,147 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{brian_rose_2005}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=1be9ccd95b2cce117fabb24f487b8f69}{%
+           family={Rose},
+           familyi={R\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{fullhash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{fullhashraw}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{bibnamehash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{authorbibnamehash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{authornamehash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{authorfullhash}{1be9ccd95b2cce117fabb24f487b8f69}
+      \strng{authorfullhashraw}{1be9ccd95b2cce117fabb24f487b8f69}
+      \field{labelalpha}{Ros05}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Othello: A Minute to Learn, A Lifetime to Master}
+      \field{year}{2005}
+      \field{dateera}{ce}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.ffothello.org/livres/othello-book-Brian-Rose.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.ffothello.org/livres/othello-book-Brian-Rose.pdf
+      \endverb
+    \endentry
+    \entry{optimisations}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=67724b7eeee039946b9801641a2c1ceb}{%
+           family={Cazenave},
+           familyi={C\bibinitperiod},
+           given={Tristan},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{fullhash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{fullhashraw}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{bibnamehash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{authorbibnamehash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{authornamehash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{authorfullhash}{67724b7eeee039946b9801641a2c1ceb}
+      \strng{authorfullhashraw}{67724b7eeee039946b9801641a2c1ceb}
+      \field{labelalpha}{Caz09}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Des Optimisations de l'Alpha-Beta}
+      \field{urlday}{13}
+      \field{urlmonth}{4}
+      \field{urlyear}{2024}
+      \field{year}{2009}
+      \field{urldateera}{ce}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.lamsade.dauphine.fr/~cazenave/papers/berder00.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.lamsade.dauphine.fr/~cazenave/papers/berder00.pdf
+      \endverb
+    \endentry
+    \entry{Liskowski_2018}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=0bac77b90d1ee8d70ef6ddfd05a42a19}{%
+           family={Liskowski},
+           familyi={L\bibinitperiod},
+           given={Pawel},
+           giveni={P\bibinitperiod}}}%
+        {{hash=0e23cbe08f8c9fcdb540f56bdb142e3e}{%
+           family={Jaskowski},
+           familyi={J\bibinitperiod},
+           given={Wojciech},
+           giveni={W\bibinitperiod}}}%
+        {{hash=f3fc371ff229d1b4d529c94a05776062}{%
+           family={Krawiec},
+           familyi={K\bibinitperiod},
+           given={Krzysztof},
+           giveni={K\bibinitperiod}}}%
+      }
+      \list{publisher}{2}{%
+        {Institute of Electrical}%
+        {Electronics Engineers (IEEE)}%
+      }
+      \strng{namehash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{fullhash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{fullhashraw}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{bibnamehash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{authorbibnamehash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{authornamehash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{authorfullhash}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \strng{authorfullhashraw}{8ab59f0f8678ebdf2f87b202b04d5127}
+      \field{labelalpha}{LJK18}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2475-1510}
+      \field{journaltitle}{IEEE Transactions on Games}
+      \field{month}{12}
+      \field{number}{4}
+      \field{title}{Learning to Play Othello With Deep Neural Networks}
+      \field{volume}{10}
+      \field{year}{2018}
+      \true{nocite}
+      \field{pages}{354\bibrangedash 364}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1109/tg.2018.2799997
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1109/TG.2018.2799997
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1109/TG.2018.2799997
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

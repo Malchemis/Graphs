@@ -1,10 +1,8 @@
 import numpy as np
-
 from pathlib import Path
-from typing import List
 
 from Node import Node
-from utils.constants import Values
+from utils.constants import Values, Directions as Dirs
 
 
 def parse_graph(path: Path):
@@ -29,26 +27,23 @@ def convert_to_node_graph(graph: np.ndarray):
     :param graph: np matrix
     :return: start node, end node, node graph
     """
-    node_graph: List[List[Node | None]] = [[None for _ in range(graph.shape[1])] for _ in range(graph.shape[0])]
+    node_graph = [[Node(position=(i, j), is_obstacle=graph[i][j] == Values.WALL) for j in range(graph.shape[1])]
+                  for i in range(graph.shape[0])]
     start_node = None
     end_node = None
+
+    # add neighbors to the graph
     for i in range(graph.shape[0]):
         for j in range(graph.shape[1]):
-            current_is_obstacle = graph[i][j] == Values.WALL
-            node_graph[i][j] = Node(position=(i, j), neighbors={}, is_obstacle=current_is_obstacle)
-            if i - 1 >= 0 and j - 1 >= 0 and graph[i - 1][j - 1] != 0:
-                node_graph[i][j].add_neighbor(node_graph[i - 1][j - 1], 1)
-            if i - 1 >= 0 and graph[i - 1][j] != 0:
-                node_graph[i][j].add_neighbor(node_graph[i - 1][j], 1)
-            if j - 1 >= 0 and graph[i][j - 1] != 0:
-                node_graph[i][j].add_neighbor(node_graph[i][j - 1], 1)
-            if i - 1 >= 0 and j + 1 < graph.shape[1] and graph[i - 1][j + 1] != 0:
-                node_graph[i][j].add_neighbor(node_graph[i - 1][j + 1], 1)
-
             if graph[i][j] == Values.START:
                 start_node = node_graph[i][j]
             elif graph[i][j] == Values.OBJECTIVE:
                 end_node = node_graph[i][j]
+            for dx, dy in [Dirs.N, Dirs.S, Dirs.E, Dirs.W, Dirs.NE, Dirs.SE, Dirs.SW, Dirs.NW]:
+                x, y = i + dx, j + dy
+                if 0 <= x < graph.shape[0] and 0 <= y < graph.shape[1]:
+                    node_graph[i][j].add_neighbor(node_graph[x][y])
+
     return start_node, end_node, node_graph
 
 

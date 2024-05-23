@@ -115,7 +115,8 @@ def display_network_shortest_path(graph, path: Optional[List[Node]] = None):
                 nx_graph.add_node(node_id, pos=(j, len(graph) - i), color=color)
                 nx_graph.add_node(neighbor_id, pos=(j + neighbor[1], len(graph) - (i + neighbor[0])),
                                   color=color_neighbor)
-                nx_graph.add_edge(node_id, neighbor_id, weight=neighbors[neighbor][0], color=edge_color)
+                nx_graph.add_edge(node_id, neighbor_id, weight=graph.cost[neighbor] if neighbor in graph.cost else 1,
+                                  color=edge_color)
 
     # Display the graph
     plt.figure(figsize=(len(graph[0]) / 2, len(graph) / 2))

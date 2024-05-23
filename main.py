@@ -1,15 +1,15 @@
 from Graph import Graph
-from utils.constants import Strategies, Problems
+from utils.constants import Algorithms, Problems
 from utils.display import display_cv2, display_network
-from utils.generation import gen_tsp
+from utils.generation import gen_tsp, gen_astar
 from tqdm import tqdm
 import time
 
 
-def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, file_path="examples/reseau_50_50_1.txt",
-         display=True, verbose=False,
-         save=False):
+def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, file_path="examples/reseau_50_50_1.txt",
+         display=False, verbose=False, save=False, n=7, p=.3):
     """Create a graph from the given file and display it."""
+    gen_tsp(n, p) if problem == Problems.TSP else gen_astar(n, p) if problem == Problems.SHORTEST_PATH else None
     graph = Graph(file_path, problem)
     times = []
 
@@ -19,29 +19,27 @@ def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, fil
         times.append(time.perf_counter() - onset)
 
         if verbose:
-            print(f"Path: {path}")
+            print(f"\nPath: {path}") if path else print("No path found")
         if display:
             display_cv2(graph, path)
             display_network(graph, path)
         if save:
             graph.solve_and_save(algo)
 
-    print(f"Average time: {sum(times) / n_iter:.6f} seconds")
+    print(f"\nAverage time for {n_iter} iterations with {algo}: {sum(times) / n_iter:.5f}s")
     return graph
 
 
-def compare_shortest_path_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/reseau_50_50_1.txt"):
+def compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/tsp.txt", n=7, p=.3):
     """Compare the execution time of the A* and CPLEX algorithms."""
     if problem == Problems.TSP:
-        main(n_iter=n_iter, algo=Strategies.BRUTE_FORCE, file_path=file_path, problem=Problems.TSP)
-        main(n_iter=n_iter, algo=Strategies.CPLEX, file_path=file_path, problem=Problems.TSP)
+        main(n_iter=n_iter, algo=Algorithms.CPLEX, file_path=file_path, problem=Problems.TSP, n=n, p=p)
+        main(n_iter=n_iter, algo=Algorithms.BRUTE_FORCE, file_path=file_path, problem=Problems.TSP, n=n, p=p)
     elif problem == Problems.SHORTEST_PATH:
-        main(n_iter=n_iter, algo=Strategies.A_STAR, file_path=file_path)
-        main(n_iter=n_iter, algo=Strategies.CPLEX, file_path=file_path)
+        main(n_iter=n_iter, algo=Algorithms.A_STAR, file_path=file_path, problem=Problems.SHORTEST_PATH, n=n, p=p)
+        main(n_iter=n_iter, algo=Algorithms.CPLEX, file_path=file_path, problem=Problems.SHORTEST_PATH, n=n, p=p)
 
 
 if __name__ == '__main__':
-    gen_tsp(30, .2)
-    main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=1, display=True, save=True,
-         file_path="examples/tsp.txt")
-    # compare_shortest_path_algo(n_iter=100, file_path="examples/tsp1.txt", problem=Problems.TSP)
+    compare_algo(n_iter=100, problem=Problems.TSP, file_path="examples/tsp.txt", n=7, p=.3)
+    # compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/astar.txt", n=50, p=.2)

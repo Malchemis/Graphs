@@ -1,3 +1,50 @@
 \chapter{Plus court chemin}
 \label{ch:shortest_path}
-ccc
+
+\section{Modélisation}
+\label{sec:shortest_path_model}
+
+On considère un graphe non orienté $G=<S,A>$ où $S$ est l'ensemble des sommets et $A$ l'ensemble des arêtes. Chaque arête $a_{ij}$ est associée à un coût $c_{ij}$, qui vaudra 1 dans le cas où deux sommets sont reliés horizontalement ou verticalement, et $\sqrt{2}$ dans le cas où ils sont reliés en diagonale. On cherche à déterminer le plus court chemin entre un sommet de départ $s$ et un sommet d'arrivée $t$.
+
+\subsection*{Variables}
+
+\begin{itemize}
+    \item $x_{ij}$ : vaut 1 si l'arête $a_{ij}$ est empruntée, 0 sinon
+\end{itemize}
+
+\subsection*{Fonction objectif}
+
+On cherche à minimiser la somme des coûts des arêtes empruntées :
+
+\begin{equation}
+    \min \sum_{(i,j) \in A} c_{ij} \cdot x_{ij}
+\end{equation}
+
+\subsection*{Contraintes}
+
+\begin{itemize}
+    \item Le sommet de départ $s$ est toujours relié à un sommet :
+    \begin{equation}
+        \sum_{j \in S} x_{sj} = 1
+    \end{equation}
+    \item De même, le sommet d'arrivée $t$ est toujours relié à un sommet :
+    \begin{equation}
+        \sum_{i \in S} x_{it} = 1
+    \end{equation}
+    \item Chaque sommet a le même nombre d'arêtes entrantes et sortantes (sauf $s$ et $t$):
+    \begin{equation}
+        \sum_{j \in S} x_{ij} = \sum_{j \in S} x_{ji} \quad \forall i \in S \setminus \{s,t\}
+    \end{equation}
+    \item Notre graphe n'étant pas orienté, nous devons empêcher les sous-cycles, c'est-à-dire le cas où on trouve une arête $a_{ij}$ et une arête $a_{ji}$ dans le chemin :
+    \begin{equation}
+        \sum_{(i,j) \in A} x_{ij} + \sum_{(j,i) \in A} x_{ji} \leq 1 \quad \forall i,j \in S \setminus \{s,t\}
+    \end{equation}
+\end{itemize}
+
+Nous avons implémenté et résolu ce problème en Python, en utilisant la librairie \texttt{docplex.mp.model} de CPLEX. Le code complet est disponible en annexe \ref{sec:shortest_path_code}.
+
+\section{A Star}
+\label{sec:shortest_path_astar}
+
+\section{Comparaison des deux implémentations}
+\label{sec:shortest_path_comparison}

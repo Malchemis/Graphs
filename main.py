@@ -3,6 +3,7 @@ from utils.constants import Strategies, Problems
 from utils.display import display_cv2, display_network
 from utils.generation import gen_tsp
 from tqdm import tqdm
+from pathlib import Path
 import time
 
 
@@ -10,10 +11,11 @@ def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Strategies.A_STAR, fil
          display=True, verbose=False,
          save=False):
     """Create a graph from the given file and display it."""
-    graph = Graph(file_path, problem)
     times = []
 
     for _ in tqdm(range(n_iter), desc=f"Running {algo} algorithm"):
+        gen_tsp(12, .8)
+        graph = Graph(file_path, problem)
         onset = time.perf_counter()
         path = graph.solve(algo)
         times.append(time.perf_counter() - onset)
@@ -41,7 +43,6 @@ def compare_shortest_path_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_
 
 
 if __name__ == '__main__':
-    gen_tsp(30, .2)
-    main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=1, display=True, save=True,
+    main(verbose=True, problem=Problems.TSP, algo=Strategies.BRUTE_FORCE, n_iter=10, display=False, save=False,
          file_path="examples/tsp.txt")
     # compare_shortest_path_algo(n_iter=100, file_path="examples/tsp1.txt", problem=Problems.TSP)

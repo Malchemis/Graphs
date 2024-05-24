@@ -126,7 +126,7 @@ Les voisins des noeuds sont stockés dans un attribut de chaque noeud et initial
 
 \subsection{Complexité de l'algorithme A*}
 
-\subsubsection*{Complexité temporelle sans heap queue}
+\subsubsection{Complexité temporelle sans heap queue}
 Sans l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une liste non ordonnée. Les opérations de recherche du nœud avec le coût \( f \) minimal et l'insertion d'un nouveau nœud sont coûteuses :
 
 \begin{itemize}
@@ -137,7 +137,7 @@ Sans l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est g
 
 La complexité temporelle totale est alors \( O(E \cdot V) \), où \( E \) est le nombre d'arêtes et \( V \) est le nombre de nœuds.
 
-\subsubsection*{Complexité temporelle avec heap queue}
+\subsubsection{Complexité temporelle avec heap queue}
 Avec l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une heap binaire. Cela optimise les opérations suivantes :
 
 \begin{itemize}
@@ -148,7 +148,7 @@ Avec l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est g
 
 Même si la vérification de la présence reste coûteuse, les opérations de base de l'algorithme, à savoir l'extraction et l'insertion dans la heap, dominent la complexité globale. La complexité temporelle totale est donc $\mathcal{O}(E \log V)$.
 
-\subsubsection*{Complexité temporelle avec heap queue et ensemble (set)}
+\subsubsection{Complexité temporelle avec heap queue et ensemble (set)}
 En ajoutant un ensemble (set) pour suivre les nœuds dans open set, on optimise la vérification de la présence :
 
 \begin{itemize}

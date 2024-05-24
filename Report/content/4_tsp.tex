@@ -100,3 +100,23 @@ Nous pouvons tester nos algorithmes avec un exemple simple fourni par l'énoncé
     \caption{Résolution d'un exemple simple de TSP}
     \label{fig:resol_bruteforce}
 \end{figure}
+
+Nous pouvons désormais comparer le temps d'exécution des deux méthodes en fonction de la taille du graphe. Nous testons les méthodes sur des graphes dont les villes ont une probabilité de connexion de 0.8. Changer cette probabilité ne semble pas avoir un impact significatif sur les résultats.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Méthode / Taille du graphe} & 6 & 8 & 10 & 12 & 20 & 30 \\
+        \hline
+        \textbf{CPLEX} & 0.012 & 0.012 & 0.013 & 0.014 & 0.023 & 0.04 \\
+        \hline
+        \textbf{Énumération} & 0.00005 & 0.025 & 2.11 & 338.57 & ? & ? \\
+        \hline
+    \end{tabular}
+    \caption{Temps d'exécution (s) des deux méthodes en fonction de la taille du graphe}
+\end{table}
+
+Nous constatons que la méthode par énumération devient rapidement impraticable pour des graphes de taille supérieure à 10, alors que la méthode CPLEX reste efficace pour des graphes de taille plus importante. Cela est dû à la complexité exponentielle de la méthode par énumération.
+
+ TODO: comparer avec la complexité théorique

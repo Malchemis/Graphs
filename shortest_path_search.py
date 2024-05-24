@@ -101,8 +101,16 @@ def shortest_path_cplex_solver(graph, start_node, end_node):
                   if (start_node, neighbor) in x) == 1
     )
     model.add_constraint(
+        model.sum(x[(neighbor, start_node)] for neighbor in start_node.neighbors.values()
+                  if (neighbor, start_node) in x) == 0
+    )
+    model.add_constraint(
         model.sum(x[(neighbor, end_node)] for neighbor in end_node.neighbors.values()
                   if (neighbor, end_node) in x) == 1
+    )
+    model.add_constraint(
+        model.sum(x[(end_node, neighbor)] for neighbor in end_node.neighbors.values()
+                  if (end_node, neighbor) in x) == 0
     )
 
     # Connectivity constraints
@@ -132,6 +140,7 @@ def shortest_path_cplex_solver(graph, start_node, end_node):
             if x[e].solution_value > 0.5:
                 # print(f"{e[0].position} -> {e[1].position}")
                 path.append(e[0])
+        path.append(graph.objective)
         return path
     else:
         # print("No solution found")

@@ -16,6 +16,7 @@ def parse_graph(path: Path):
             parsed_line = line.split(" ")
             if parsed_line[-1] == "\n":
                 parsed_line.remove("\n")
+            parsed_line = list(map(lambda x: x.replace("\t", ""), parsed_line))
             graph[index] = np.array(list(map(int, parsed_line)))
             index += 1
     return convert_to_node_graph(graph)

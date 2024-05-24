@@ -30,16 +30,19 @@ def main(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, fil
     return graph
 
 
-def compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/tsp.txt", n=7, p=.3):
+def compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, n=7, p=.3):
     """Compare the execution time of the A* and CPLEX algorithms."""
     if problem == Problems.TSP:
+        file_path = f"examples/tsp.txt"
         main(n_iter=n_iter, algo=Algorithms.CPLEX, file_path=file_path, problem=Problems.TSP, n=n, p=p)
         main(n_iter=n_iter, algo=Algorithms.BRUTE_FORCE, file_path=file_path, problem=Problems.TSP, n=n, p=p)
     elif problem == Problems.SHORTEST_PATH:
+        file_path = f"examples/astar.txt"
         main(n_iter=n_iter, algo=Algorithms.A_STAR, file_path=file_path, problem=Problems.SHORTEST_PATH, n=n, p=p)
         main(n_iter=n_iter, algo=Algorithms.CPLEX, file_path=file_path, problem=Problems.SHORTEST_PATH, n=n, p=p)
 
 
 if __name__ == '__main__':
-    compare_algo(n_iter=100, problem=Problems.TSP, file_path="examples/tsp.txt", n=7, p=.3)
+    #main(1, Problems.SHORTEST_PATH, Algorithms.A_STAR, "examples/reseau_20_20_1.txt", display=True, verbose=True, save=False)
+    compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, n=20, p=.2)
     # compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/astar.txt", n=50, p=.2)

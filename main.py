@@ -41,7 +41,7 @@ def compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, n=7, p=.3, file_pat
 
 
 if __name__ == '__main__':
-    run(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, n=120, p=.3, display=False, verbose=False,
+    run(n_iter=20, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, n=500, p=.3, display=False, verbose=False,
         save=False, file_path="examples/astar.txt")
     # compare_algo(n_iter=100, problem=Problems.TSP, n=8, p=.2, file_path="examples/tsp.txt")
     # compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/astar.txt", n=120, p=.3)

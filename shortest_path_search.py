@@ -83,8 +83,9 @@ def heuristic(node: Node, end_node: Node) -> float:
     :return: heuristic value
     """
     # We could use the Manhattan distance instead. For our case, the Euclidian distance is better
-    # return euclidean(node, end_node)
-    return 0
+    # return manhattan(node, end_node)
+    return euclidean(node, end_node)
+    # return 0
 
 
 def shortest_path_cplex_solver(graph, start_node, end_node):

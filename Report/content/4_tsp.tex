@@ -46,7 +46,7 @@ On cherche à minimiser la somme des distances des arêtes empruntées :
 
 Le code Python équivalent à ce modèle est donné en annexe \ref{app:tsp_model}.
 
-\section*{Résolution par énumération}
+\section{Résolution par énumération}
 
 On peut résoudre le problème du TSP en énumérant toutes les permutations possibles des villes, et en calculant la distance totale pour chaque permutation. La solution optimale est celle qui minimise la distance totale.
 
@@ -76,7 +76,7 @@ On peut résoudre le problème du TSP en énumérant toutes les permutations pos
 
 \end{algorithm}
 
-\section*{Génération de graphes aléatoires}
+\section{Génération de graphes aléatoires}
 
 Nous pouvons implémenter une fonction pour générer des graphes aléatoires de $n$ villes avec des coûts aléatoires. Nous pourrons ainsi tester nos algorithmes sur des graphes de différentes tailles.
 Nous choisissons des coûts entre 10 et 50, et les villes ont une probabilité $p$ d'être connectées.
@@ -88,7 +88,7 @@ Nous choisissons des coûts entre 10 et 50, et les villes ont une probabilité $
     \label{fig:gen_tsp}
 \end{figure}
 
-\section*{Résultats et comparaison des méthodes}
+\section{Résultats et comparaison des méthodes}
 
 Nous pouvons tester nos algorithmes avec un exemple simple fourni par l'énoncé. Ils nous donnent le même résultat :
 

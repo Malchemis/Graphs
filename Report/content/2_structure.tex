@@ -27,7 +27,7 @@ La classe \texttt{Graph} est utilisée pour représenter et manipuler le graphe.
     \item \textbf{file\_path, problem} : Le chemin vers le fichier d'entrée et le type de problème à résoudre.
 \end{itemize}
 
-Remarque : la présence de deux structures de graphes, \texttt{node\_list}, et \texttt{graph} s'explique par la différence de représentation des noeuds pour les deux problèmes. Pour \ac{SPP}, nous utilisons une matrice de noeuds pour faciliter l'implémentation des algorithmes de recherche, notamment CPLEX. Dans ce cas, les couts sont directement dépendant de coordonnées. Pour \ac{TSP}, nous utilisons une liste de noeuds pour faciliter la manipulation des ensembles de noeuds. Dans ce cas, les couts sont définis par l'utilisateur, il n'y a pas de dépendance directe avec les coordonnées.
+Remarque : la présence de deux structures de graphes, \texttt{node\_list}, et \texttt{graph} s'explique par la différence de représentation des noeuds pour les deux problèmes. Pour \ac{SPP}, nous utilisons une matrice de noeuds pour faciliter l'implémentation des algorithmes de recherche, notamment CPLEX. Dans ce cas, les coûts sont directement dépendants de coordonnées. Pour \ac{TSP}, nous utilisons une liste de noeuds pour faciliter la manipulation des ensembles de noeuds. Dans ce cas, les coûts sont définis par l'utilisateur, il n'y a pas de dépendance directe avec les coordonnées.
 
 \subsection{Méthodes principales}
 \begin{itemize}
@@ -39,7 +39,7 @@ Remarque : la présence de deux structures de graphes, \texttt{node\_list}, et \
     \item \textbf{get\_edges} : Retourne une liste de toutes les arêtes du graphe.
 \end{itemize}
 
-Remarque : les méthodes \texttt{add\_node}, \texttt{add\_edge}, et \texttt{remove\_node} sont implémentées pour les deux types de problèmes mais ne sont pas utilisées au sein du projet. Elles sont utiles si l'on veut manipuler dynamiquement le graphe ; ce qui est possible, mais n'a pas été necessaire pour les problèmes traités dans ce TP. Lorsque nous avions besoin de créer un graphe, nous initialisions les variables nécessaires via le traitement du fichier d'entrée.
+Remarque : les méthodes \texttt{add\_node}, \texttt{add\_edge}, et \texttt{remove\_node} sont implémentées pour les deux types de problèmes mais ne sont pas utilisées au sein du projet. Elles sont utiles si l'on veut manipuler dynamiquement le graphe ; ce qui est possible, mais n'a pas été nécessaire pour les problèmes traités dans ce TP. Lorsque nous avions besoin de créer un graphe, nous initialisions les variables nécessaires via le traitement du fichier d'entrée.
 
 \section{Choix de performance et praticité}
 \begin{itemize}

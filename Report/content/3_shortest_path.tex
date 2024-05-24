@@ -201,3 +201,23 @@ Nous avons une légère différence dans le chemin trouvé par CPLEX et A Star s
     \caption{Graphique de la solution trouvée par A Star}
     \label{fig:astar_2020}
 \end{figure}
+
+\subsection{Comparaison des temps de calcul}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{Méthode / Taille du graphe} & 10 & 15 & 30 & 60 & 120 \\
+        \hline
+        \textbf{A*} & 0.02184 & 0.00013 & 0.00051 & 0.00248 & 0.00804s \\
+        \hline
+        \textbf{CPLEX} & 0.00009 & 0.04013 & 0.19364 & 0.56905 & 2.36712s \\
+        \hline
+    \end{tabular}
+    \caption{Temps d'exécution (s) des deux méthodes en fonction de la taille du graphe. Moyenne obtenue sur 100 itérations. Densité des arêtes : 0.3}
+\end{table}
+
+n= 500, p=0.3
+h=0 : 0.00965s
+h=euclidienne : 0.01021s
+h=manhattan : 0.01002s

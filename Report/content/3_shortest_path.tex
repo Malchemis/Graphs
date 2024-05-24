@@ -169,13 +169,32 @@ La complexité temporelle - $\mathcal{O}(E \log V)$ ou $\mathcal{O}(E \cdot V)$ 
 
 Afin de pouvoir comparer les deux implémentations, nous avons créé une fonction générant des graphes aléatoires. Cette fonction prend en paramètre le nombre de sommets $n$ et la probabilité $p$ qu'un sommet soit un obstacle.
 
-\begin{figure}[H]
-    \centering
-    \begin{includegraphics}[width=1\textwidth]{resources/gen_path_graph.png}
-    \end{includegraphics}
-    \caption{Fonction générant un graphe aléatoire}
-    \label{fig:gen_path_graph}
-\end{figure}
+\begin{verbatim}
+def gen_astar(n: int, p: float, file_name: str = "astar.txt"):
+    graph = [[Values.WALL for _ in range(n)] for _ in range(n)]
+
+    # Generate nodes
+    for i in range(n):
+        for j in range(n):
+            if random.random() < p:
+                graph[i][j] = Values.EMPTY
+
+    # Select a random start and objective node
+    empty_nodes = [(i,j) for i in range(n) for j in range(n) if graph[i][j]
+                                                           == Values.EMPTY]
+    start, objective = random.sample(empty_nodes, 2)
+    graph[start[0]][start[1]] = Values.START
+    graph[objective[0]][objective[1]] = Values.OBJECTIVE
+
+    # Write to file
+    Path("examples").mkdir(parents=True, exist_ok=True)
+    with open(f"examples/{file_name}", "w") as f:
+        f.write(f"{n} {n}\n")
+        for i in range(n):
+            for j in range(n):
+                f.write(f"{graph[i][j]} ")
+            f.write("\n")
+\end{verbatim}
 
 \section{Résultats et comparaison des deux implémentations}
 \label{sec:shortest_path_comparison}

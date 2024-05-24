@@ -81,12 +81,24 @@ On peut résoudre le problème du TSP en énumérant toutes les permutations pos
 Nous pouvons implémenter une fonction pour générer des graphes aléatoires de $n$ villes avec des coûts aléatoires. Nous pourrons ainsi tester nos algorithmes sur des graphes de différentes tailles.
 Nous choisissons des coûts entre 10 et 50, et les villes ont une probabilité $p$ d'être connectées.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.86\textwidth]{resources/gen_tsp.png}
-    \caption{Fonction de génération de graphes aléatoires pour le TSP}
-    \label{fig:gen_tsp}
-\end{figure}
+\begin{verbatim}
+def gen_tsp(n: int, p: float, file_name: str = "tsp.txt"):
+    nodes = [], cost = {}
+
+    for i in range(n):
+        nodes.append(i)
+
+    for i in range(n):
+        for j in range(i+1, n):
+            if random.random() < p:
+                cost[(i, j)] = random.randint(10, 50)
+                       
+    Path("examples").mkdir(parents=True, exist_ok=True)
+    with open(f"examples/{file_name}", "w") as f:
+        f.write(f"{n} {len(cost)}\n")
+        for (i, j), c in cost.items():
+            f.write(f"{i} {j} {c}\n")
+\end{verbatim}
 
 \section{Résultats et comparaison des méthodes}
 

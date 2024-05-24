@@ -1,7 +1,7 @@
 \chapter{Problème du voyageur de commerce}
 \label{chap:tsp}
 
-Le problème du voyageur de commerce (TSP) consiste à trouver le plus court chemin passant par chaque ville une et une seule fois, et revenant à la ville de départ. Nous allons employer deux méthodes pour résoudre ce problème : une résolution linéaire avec CPLEX \cite{wiki_tsp} et une résolution par énumération des permutations possibles.
+Le \ac{TSP} consiste à trouver le plus court chemin passant par chaque ville une et une seule fois, et revenant à la ville de départ. Nous allons employer deux méthodes pour résoudre ce problème : une résolution linéaire avec CPLEX \cite{wiki_tsp} et une résolution par énumération des permutations possibles.
 
 \section{Modélisation}
 \label{sec:tsp_model}
@@ -48,7 +48,7 @@ Le code Python équivalent à ce modèle est donné en annexe \ref{app:tsp_model
 
 \section{Résolution par énumération}
 
-On peut résoudre le problème du TSP en énumérant toutes les permutations possibles des villes, et en calculant la distance totale pour chaque permutation. La solution optimale est celle qui minimise la distance totale.
+On peut résoudre le \ac{TSP} en énumérant toutes les permutations possibles des villes, et en calculant la distance totale pour chaque permutation. La solution optimale est celle qui minimise la distance totale.
 
 \begin{algorithm}[H]
     \caption{tsp\_brute\_force}\label{alg:tsp_enum}

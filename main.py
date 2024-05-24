@@ -9,11 +9,11 @@ import time
 def run(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, file_path="examples/reseau_50_50_1.txt",
         display=False, verbose=False, save=False, n=7, p=.3):
     """Run the algorithm on the given problem."""
-    gen_tsp(n, p) if problem == Problems.TSP else gen_astar(n, p) if problem == Problems.SHORTEST_PATH else None
-    graph = Graph(file_path, problem)
     times = []
 
     for _ in tqdm(range(n_iter), desc=f"Running {algo} algorithm"):
+        gen_tsp(n, p) if problem == Problems.TSP else gen_astar(n, p) if problem == Problems.SHORTEST_PATH else None
+        graph = Graph(file_path, problem)
         onset = time.perf_counter()
         path = graph.solve(algo, save=save)
         times.append(time.perf_counter() - onset)
@@ -41,6 +41,7 @@ def compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, n=7, p=.3, file_pat
 
 
 if __name__ == '__main__':
-    run(n_iter=10, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, n=50, p=.3, display=True, verbose=True)
+    run(n_iter=100, problem=Problems.SHORTEST_PATH, algo=Algorithms.A_STAR, n=120, p=.3, display=False, verbose=False,
+        save=False, file_path="examples/astar.txt")
     # compare_algo(n_iter=100, problem=Problems.TSP, n=8, p=.2, file_path="examples/tsp.txt")
-    # compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/astar.txt", n=50, p=.3)
+    # compare_algo(n_iter=100, problem=Problems.SHORTEST_PATH, file_path="examples/astar.txt", n=120, p=.3)

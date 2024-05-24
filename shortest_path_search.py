@@ -83,7 +83,8 @@ def heuristic(node: Node, end_node: Node) -> float:
     :return: heuristic value
     """
     # We could use the Manhattan distance instead. For our case, the Euclidian distance is better
-    return euclidean(node, end_node)
+    # return euclidean(node, end_node)
+    return 0
 
 
 def shortest_path_cplex_solver(graph, start_node, end_node):
@@ -99,22 +100,7 @@ def shortest_path_cplex_solver(graph, start_node, end_node):
 
     # Constraints
     # Ensure exactly one outgoing edge from start and one incoming edge to end
-    model.add_constraint(
-        model.sum(x[(start_node, neighbor)] for neighbor in start_node.neighbors.values()
-                  if (start_node, neighbor) in x) == 1
-    )
-    model.add_constraint(
-        model.sum(x[(neighbor, start_node)] for neighbor in start_node.neighbors.values()
-                  if (neighbor, start_node) in x) == 0
-    )
-    model.add_constraint(
-        model.sum(x[(neighbor, end_node)] for neighbor in end_node.neighbors.values()
-                  if (neighbor, end_node) in x) == 1
-    )
-    model.add_constraint(
-        model.sum(x[(end_node, neighbor)] for neighbor in end_node.neighbors.values()
-                  if (end_node, neighbor) in x) == 0
-    )
+    add_edge_constraints(model, x, start_node, end_node)
 
     # Connectivity constraints
     for row in graph:
@@ -148,3 +134,25 @@ def shortest_path_cplex_solver(graph, start_node, end_node):
     else:
         # print("No solution found")
         return None
+
+
+def add_edge_constraints(model, x, start_node, end_node):
+    # Helper function to add a single constraint
+    def add_single_constraint(node, is_start, is_outgoing):
+        neighbor_list = node.neighbors.values()
+        if is_outgoing:
+            edge_expr = model.sum(x[(node, neighbor)] for neighbor in neighbor_list if (node, neighbor) in x)
+            value = 1 if is_start else 0
+        else:
+            edge_expr = model.sum(x[(neighbor, node)] for neighbor in neighbor_list if (neighbor, node) in x)
+            value = 0 if is_start else 1
+        
+        return edge_expr == value
+    
+    # Constraints for start_node
+    model.add_constraint(add_single_constraint(start_node, is_start=True, is_outgoing=True), "outgoing_edge_from_start")
+    model.add_constraint(add_single_constraint(start_node, is_start=True, is_outgoing=False), "incoming_edge_to_start")
+
+    # Constraints for end_node
+    model.add_constraint(add_single_constraint(end_node, is_start=False, is_outgoing=True), "outgoing_edge_from_end")
+    model.add_constraint(add_single_constraint(end_node, is_start=False, is_outgoing=False), "incoming_edge_to_end")

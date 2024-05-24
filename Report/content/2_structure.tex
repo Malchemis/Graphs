@@ -1,3 +1,67 @@
 \chapter{Structure du projet}
 \label{chap:structure}
-bbb
+
+Dans ce chapitre, nous décrivons la structure de données et les choix techniques effectués pour la représentation et la manipulation des graphes utilisés dans ce TP. Nous implémentation se construit autour de deux types de problèmes : le problème du plus court chemin et le problème du voyageur de commerce.
+
+\section{Représentation des noeuds}
+Nous avons choisi de représenter chaque noeud du graphe à l'aide d'une classe \texttt{Node}. Cette classe contient les informations nécessaires pour les algorithmes de recherche de chemin et les fonctions associées. Voici la description des attributs principaux :
+
+\begin{itemize}
+    \item \textbf{position} : Un tuple \texttt{(x, y)} représentant les coordonnées du noeud dans le réseau.
+    \item \textbf{neighbors} : Un dictionnaire où les clés sont des directions \texttt{(dx, dy)} et les valeurs sont les noeuds voisins correspondants. Cela permet de naviguer efficacement dans le graphe.
+    \item \textbf{parent} : Le noeud parent, utilisé pour reconstruire le chemin après l'exécution de l'algorithme A*.
+    \item \textbf{is\_obstacle} : Un booléen indiquant si le noeud est un obstacle (non praticable). Les noeuds obstacles ne peuvent pas être voisins d'autres noeuds. Permet une structure de graphe dynamique.
+    \item \textbf{g, h, f} : Ces attributs sont utilisés dans l'algorithme A*. \texttt{g} est le coût du chemin depuis le noeud de départ, \texttt{h} est une estimation heuristique du coût pour atteindre la destination, et \texttt{f} est la somme des deux (\texttt{f = g + h}).
+\end{itemize}
+
+\section{Représentation du graphe}
+La classe \texttt{Graph} est utilisée pour représenter et manipuler le graphe. Elle gère deux types de problèmes : le problème du plus court chemin et le problème du voyageur de commerce.
+
+\subsection{Attributs principaux}
+\begin{itemize}
+    \item \textbf{start, objective} : Les noeuds de départ et d'arrivée pour le problème du plus court chemin.
+    \item \textbf{graph} : Une matrice de noeuds utilisée pour le problème du plus court chemin. Notre (0, 0) est la node en haut à gauche du graphe, pour faciliter la manipulation et visualisation lignes/colonnes.
+    \item \textbf{node\_list} : Une liste de noeuds utilisée pour le problème du voyageur de commerce.
+    \item \textbf{cost} : Un dictionnaire où les clés sont des tuples de noeuds et les valeurs sont les coûts des arêtes entre ces noeuds.
+    \item \textbf{shape} : Les dimensions du graphe. La valeur est dynamique, initialisée lors de la lecture du fichier d'entrée. Si les dimensions du graphe sont modifiés, cette valeur est alors mise à jour.
+    \item \textbf{file\_path, problem} : Le chemin vers le fichier d'entrée et le type de problème à résoudre.
+\end{itemize}
+
+Remarque : la présence de deux structures de graphes, \texttt{node\_list}, et \texttt{graph} s'explique par la différence de représentation des noeuds pour les deux problèmes. Pour le problème du plus court chemin, nous utilisons une matrice de noeuds pour faciliter l'implémentation des algorithmes de recherche, notamment CPLEX. Dans ce cas, les couts sont directement dépendant de coordonnées. Pour le problème du voyageur de commerce, nous utilisons une liste de noeuds pour faciliter la manipulation des ensembles de noeuds. Dans ce cas, les couts sont définis par l'utilisateur, il n'y a pas de dépendance directe avec les coordonnées.
+
+\subsection{Méthodes principales}
+\begin{itemize}
+    \item \textbf{add\_node} : Ajoute un noeud au graphe. Pour le problème du plus court chemin, le graphe est étendu si nécessaire. Pour le problème du voyageur de commerce, le noeud est simplement ajouté à la liste.
+    \item \textbf{add\_edge} : Ajoute une arête entre deux noeuds avec un coût spécifié. Cette méthode vérifie également que les noeuds sont voisins dans le problème du plus court chemin.
+    \item \textbf{remove\_node} : Marque un noeud comme obstacle et déconnecte ses voisins.
+    \item \textbf{solve} : Résout le problème spécifié en utilisant l'algorithme A* pour le plus court chemin ou une méthode d'énumération pour le voyageur de commerce.
+    \item \textbf{get\_neighbors} : Retourne les voisins d'un noeud donné. Prend en compte les obstacles et les limites du graphe.
+    \item \textbf{get\_edges} : Retourne une liste de toutes les arêtes du graphe.
+\end{itemize}
+
+Remarque : les méthodes \texttt{add\_node}, \texttt{add\_edge}, et \texttt{remove\_node} sont implémentées pour les deux types de problèmes mais ne sont pas utilisées au sein du projet. Elles sont utiles si l'on veut manipuler dynamiquement le graphe ; ce qui est possible, mais n'a pas été necessaire pour les problèmes traités dans ce TP. Lorsque nous avions besoin de créer un graphe, nous initialisions les variables nécessaires via le traitement du fichier d'entrée.
+
+\section{Choix de performance et praticité}
+\begin{itemize}
+    \item \textbf{Utilisation de dictionnaires pour les voisins} : Cette structure permet un accès rapide et une gestion efficace des voisins d'un noeud.
+    \item \textbf{Matrice de noeuds} : Pour le problème du plus court chemin, cette représentation facilite l'implémentation des algorithmes de recherche et de parcours.
+    \item \textbf{Liste de noeuds} : Pour le problème du voyageur de commerce, cette représentation est plus adaptée car elle permet de manipuler facilement les ensembles de noeuds.
+    \item \textbf{Coûts des arêtes} : Les coûts sont calculés à partir de la distance euclidienne pour le problème du plus court chemin, ce qui permet une estimation réaliste des distances. Pour le problème du voyageur de commerce, les coûts sont définis par l'utilisateur dans le fichier d'entrée.
+\end{itemize}
+
+
+\section{Exécution du programme}
+Pour exécuter le programme, nous utilisons le fichier \texttt{main.py} qui contient les fonctions principales pour lancer les différents algorithmes sur les problèmes spécifiés. Voici une explication détaillée de la fonction principale et de son utilisation :
+
+\begin{itemize}
+    \item \textbf{run} : Cette fonction exécute l'algorithme spécifié sur le problème donné. Les paramètres incluent le nombre d'itérations (\texttt{n\_iter}), le type de problème (\texttt{problem}), l'algorithme à utiliser (\texttt{algo}), le chemin du fichier d'entrée (\texttt{file\_path}), et des options pour afficher (\texttt{display}), sauvegarder (\texttt{save}), ou afficher les détails (\texttt{verbose}) du résultat. La fonction génère d'abord le graphe à partir du fichier spécifié, puis exécute l'algorithme et mesure le temps d'exécution pour chaque itération.
+    \item \textbf{compare\_algo} : Cette fonction compare les temps d'exécution des algorithmes A* et CPLEX pour le problème du plus court chemin, ou des algorithmes de force brute et CPLEX pour le problème du voyageur de commerce. Si un chemin de fichier est spécifié, la résolution est effectuée sur ce fichier, sinon un graphe aléatoire est généré.
+\end{itemize}
+
+Pour exécuter le programme, ouvrez un terminal et utilisez la commande suivante :
+
+\begin{verbatim}
+python main.py
+\end{verbatim}
+
+Les modules python nécessaires sont spécifiés dans le fichier \texttt{requirements.txt}. Le module \texttt{docplex} est requis mais n'est pas dans le fichier car la licence pro ou académique est nécessaire pour résoudre les problèmes de plus de 30 noeuds.

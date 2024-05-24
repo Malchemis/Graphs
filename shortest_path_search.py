@@ -22,6 +22,7 @@ def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
     """
     open_set = [start_node]
     heapq.heapify(open_set)
+    open_set_tracker = {start_node}  # used for faster membership checking
 
     start_node.g = 0
     start_node.h = heuristic(start_node, end_node)
@@ -31,6 +32,7 @@ def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
     while open_set:
         # Use a priority queue to get the node with the lowest f value
         current_node: Node = heapq.heappop(open_set)  # Also remove from open set
+        open_set_tracker.remove(current_node)
 
         # Path found
         if current_node == end_node:
@@ -44,8 +46,9 @@ def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
                 neighbor.g = tentative_g
                 neighbor.h = heuristic(neighbor, end_node)
                 neighbor.f = neighbor.g + neighbor.h
-                if neighbor not in open_set:  # To be visited
+                if neighbor not in open_set_tracker:  # To be visited
                     heapq.heappush(open_set, neighbor)
+                    open_set_tracker.add(neighbor)
 
     return None
 
@@ -85,7 +88,7 @@ def heuristic(node: Node, end_node: Node) -> float:
 
 def shortest_path_cplex_solver(graph, start_node, end_node):
     model = Model("Pathfinding")
-    edges = graph.get_edges()
+    edges = graph.cost.keys()
     cost = graph.cost
 
     # Variables for each edge: 1 if edge is used, 0 otherwise

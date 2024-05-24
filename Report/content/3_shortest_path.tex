@@ -6,13 +6,13 @@
 
 On considère un graphe non orienté $G=<S,A>$ où $S$ est l'ensemble des sommets et $A$ l'ensemble des arêtes. Chaque arête $a_{ij}$ est associée à un coût $c_{ij}$, qui vaudra 1 dans le cas où deux sommets sont reliés horizontalement ou verticalement, et $\sqrt{2}$ dans le cas où ils sont reliés en diagonale. On cherche à déterminer le plus court chemin entre un sommet de départ $s$ et un sommet d'arrivée $t$.
 
-\subsection*{Variables}
+\subsection{Variables}
 
 \begin{itemize}
     \item $x_{ij}$ : vaut 1 si l'arête $a_{ij}$ est empruntée, 0 sinon
 \end{itemize}
 
-\subsection*{Fonction objectif}
+\subsection{Fonction objectif}
 
 On cherche à minimiser la somme des coûts des arêtes empruntées :
 
@@ -20,7 +20,7 @@ On cherche à minimiser la somme des coûts des arêtes empruntées :
     \min \sum_{(i,j) \in A} c_{ij} \cdot x_{ij}
 \end{equation}
 
-\subsection*{Contraintes}
+\subsection{Contraintes}
 
 \begin{itemize}
     \item Le sommet de départ $s$ est toujours relié à un sommet :
@@ -53,6 +53,115 @@ Nous avons implémenté et résolu ce problème en Python, en utilisant la libra
 
 \section{A Star}
 \label{sec:shortest_path_astar}
+
+L'algorithme A* est une méthode heuristique utilisée pour trouver le plus court chemin entre deux sommets dans un graphe. Il combine les avantages de la recherche en profondeur et de la recherche en largeur tout en utilisant une fonction heuristique pour guider la recherche. Voici une description du pseudo-code de base de l'algorithme A* et des améliorations apportées.
+
+\subsection{Pseudo-code de base}
+Le pseudo-code de base de l'algorithme A* est le suivant :
+\begin{enumerate}
+    \item Initialiser l'ensemble ouvert (open set) avec le noeud de départ.
+    \item Initialiser le coût g du noeud de départ à 0.
+    \item Calculer la valeur heuristique h pour le noeud de départ et mettre à jour sa valeur f (f = g + h).
+    \item Répéter jusqu'à ce que l'ensemble ouvert soit vide :
+    \begin{enumerate}
+        \item Extraire le noeud avec la plus petite valeur f de l'ensemble ouvert.
+        \item Si ce noeud est le noeud d'arrivée, reconstruire le chemin en remontant à travers les parents.
+        \item Pour chaque voisin du noeud courant :
+        \begin{enumerate}
+            \item Calculer le coût g temporaire pour ce voisin.
+            \item Si ce coût g est inférieur au coût g actuel du voisin, mettre à jour les valeurs g, h et f du voisin, et définir le noeud courant comme parent du voisin.
+            \item Ajouter le voisin à l'ensemble ouvert s'il n'y est pas déjà.
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+Pour que cet algorithme fonctionne, il ne faut pas oublier d'initialiser la valeur g des noeuds à l'infini. Aussi, il faudrait réinitialiser les valeurs g, h et f des noeuds à l'infini à chaque itération de l'algorithme. Cela permet de recalculer les valeurs g, h et f correctement pour chaque itération.
+
+\subsection{Améliorations avec la heap queue}
+Pour améliorer l'efficacité de l'algorithme A*, nous utilisons une file de priorité (heap queue) pour l'ensemble ouvert. Cela permet d'extraire le noeud avec la plus petite valeur f en temps logarithmique. Les voisins des noeuds sont initialisés une seule fois au début du programme, ce qui réduit le coût de recalcul des voisins à chaque itération.
+
+\subsection{Améliorations avec un ensemble de noeuds visités}
+Pour réduire la vérification de présence d'un noeud dans l'ensemble ouvert, nous utilisons un ensemble (set en python) pour suivre les noeuds déjà visités. Cela permet de vérifier si un noeud est dans l'ensemble ouvert en temps constant.
+
+\subsection{Implémentation en Python}
+Les optimisations se traduisent dans le code Python suivant :
+
+\begin{verbatim}
+def a_star(start_node: Node, end_node: Node) -> Optional[List[Node]]:
+    open_set = [start_node]
+    heapq.heapify(open_set)
+    opens_set_tracker = {start_node}
+
+    start_node.g = 0
+    start_node.h = heuristic(start_node, end_node)
+    start_node.f = start_node.h
+
+    while open_set:
+        current_node: Node = heapq.heappop(open_set)
+        opens_set_tracker.remove(current_node)
+
+        if current_node == end_node:
+            return reconstruct_path(current_node)
+
+        for neighbor in current_node.neighbors.values():
+            tentative_g = current_node.g + distance(current_node, neighbor)
+            if tentative_g < neighbor.g:
+                neighbor.parent = current_node
+                neighbor.g = tentative_g
+                neighbor.h = heuristic(neighbor, end_node)
+                neighbor.f = neighbor.g + neighbor.h
+                if neighbor not in open_set_tracker:
+                    heapq.heappush(open_set, neighbor)
+                    opens_set_tracker.add(neighbor)
+
+    return None
+\end{verbatim}
+
+Remarque : les fonctions \texttt{heuristic}, \texttt{distance}, et \texttt{reconstruct\_path} sont des fonctions auxiliaires utilisées dans l'algorithme A*. Les deux premières permettent une flexibilité dans le calcul des coûts et des heuristiques, tandis que la dernière permet de reconstruire le chemin à partir du noeud d'arrivée via les parents. Par défaut une bonne mesure de distance est la distance de Manhattan, et une bonne heuristique est la distance euclidienne. Cette dernière permet le déplacement en diagonale. Nous n'utilisons pas la distance euclidienne pour le cout de déplacement, car elle favorise une augmentation du nombre de noeuds visités et donc une augmentation du temps de calcul.
+
+\subsection{Optimisation spatiale et temporelle}
+L'algorithme A* n'utilise pas l'ensemble complet de la matrice du graphe, mais uniquement les noeuds de départ et d'arrivée ainsi que les voisins nécessaires pour chaque itération. Cela permet d'optimiser l'utilisation de la mémoire et d'accélérer les opérations.
+
+Les voisins des noeuds sont stockés dans un attribut de chaque noeud et initialisés une seule fois au début du programme. Ainsi, chaque résolution de A* n'appelle pas de fonctions \texttt{get\_neighbors}, mais opère directement sur l'attribut \texttt{neighbors} de chaque noeud.
+
+\subsection{Complexité de l'algorithme A*}
+
+\subsubsection*{Complexité temporelle sans heap queue}
+Sans l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une liste non ordonnée. Les opérations de recherche du nœud avec le coût \( f \) minimal et l'insertion d'un nouveau nœud sont coûteuses :
+
+\begin{itemize}
+    \item Extraction du nœud avec le coût \( f \) minimal : \( O(n) \)
+    \item Insertion d'un nouveau nœud : \( O(1) \)
+    \item Vérification de la présence dans open set : \( O(n) \)
+\end{itemize}
+
+La complexité temporelle totale est alors \( O(E \cdot V) \), où \( E \) est le nombre d'arêtes et \( V \) est le nombre de nœuds.
+
+\subsubsection*{Complexité temporelle avec heap queue}
+Avec l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une heap binaire. Cela optimise les opérations suivantes :
+
+\begin{itemize}
+    \item Extraction du nœud avec le coût \( f \) minimal : \( O(\log n) \)
+    \item Insertion d'un nouveau nœud : \( O(\log n) \)
+    \item Vérification de la présence dans open set : \( O(n) \)
+\end{itemize}
+
+Même si la vérification de la présence reste coûteuse, les opérations de base de l'algorithme, à savoir l'extraction et l'insertion dans la heap, dominent la complexité globale. La complexité temporelle totale est donc \( O(E \log V) \).
+
+\subsubsection*{Complexité temporelle avec heap queue et ensemble (set)}
+En ajoutant un ensemble (set) pour suivre les nœuds dans open set, on optimise la vérification de la présence :
+
+\begin{itemize}
+    \item Extraction du nœud avec le coût \( f \) minimal : \( O(\log n) \)
+    \item Insertion d'un nouveau nœud : \( O(\log n) \)
+    \item Vérification de la présence dans open set : \( O(1) \)
+\end{itemize}
+
+Cependant, ces améliorations ne changent pas la complexité dominante de l'algorithme. L'opération d'extraction du nœud avec le coût \( f \) minimal et l'insertion dans la heap binaire restent les opérations les plus coûteuses et se produisent \( O(E) \) fois. Par conséquent, la complexité temporelle totale reste \( O(E \log V) \).
+
+\subsubsection*{Note}
+La complexité temporelle - \( O(E \log V) \) ou \( O(E \cdot V) \) - est une borne supérieure. En pratique, à moins qu'il n'existe aucun chemin entre les deux nœuds, et pour une bonne heuristique, la complexité temporelle est bien plus faible.
+
 
 \section{Génération de graphes aléatoires}
 \label{sec:shortest_path_random_graph}

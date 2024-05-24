@@ -89,7 +89,8 @@ class Graph:
             if position in self.node_list:
                 self.node_list.remove(position)
 
-    def solve(self, algo: Algorithms = Algorithms.A_STAR) -> Optional[List[Node]]:
+    def solve(self, algo: Algorithms = Algorithms.A_STAR, save=False) -> Optional[List[Node]]:
+        path = None
         if self.problem == Problems.SHORTEST_PATH:
             if self.start is None or self.objective is None:
                 warnings.warn("Start or objective node not set.")
@@ -108,7 +109,6 @@ class Graph:
             else:
                 warnings.warn(f"Algorithm {algo} not implemented.")
                 return
-            return path
         elif self.problem == Problems.TSP:
             if algo == Algorithms.BRUTE_FORCE:
                 path = brute_force(self)
@@ -117,12 +117,14 @@ class Graph:
             else:
                 warnings.warn(f"Algorithm {algo} not implemented.")
                 return
-            return path
+        if save:
+            self.save(path)
+        return path
 
-    def solve_and_save(self, strategy: Algorithms = Algorithms.A_STAR):
+    # -- Utils --
+    def save(self, path):
         if self.file_path is None:
             raise ValueError("Couldn't save the solution: File path not set.")
-        path = self.solve(strategy)
 
         file_name = self.file_path.split("/")[-1].split(".")[0]
         text_to_save = ""
@@ -144,7 +146,6 @@ class Graph:
             f.write(text_to_save)
             print(f"Solution saved in solutions/sol_{file_name}.txt")
 
-    # -- Utils --
     def extend_graph(self, position: Tuple[int, int]):
         """Shift or add columns and lines to the graph to include the position."""
         if position[0] < 0:  # shift down

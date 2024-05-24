@@ -48,7 +48,8 @@ def display_network(graph, path: Optional[List[Node]] = None):
         edge_color_map = nx.get_edge_attributes(nx_graph, 'color').values()
         pos = nx.get_node_attributes(nx_graph, 'pos')
         nx.draw_networkx(nx_graph, with_labels=False, pos=pos, node_color=node_color_map, edge_color=edge_color_map)
-        nx.draw_networkx_labels(nx_graph, pos, font_color="white")
+        if graph.problem == Problems.TSP:
+            nx.draw_networkx_labels(nx_graph, pos, font_color="white")
         nx.draw_networkx_edge_labels(nx_graph, pos, edge_labels=nx.get_edge_attributes(nx_graph, 'weight'))
         plt.show()
     else:
@@ -115,8 +116,7 @@ def display_network_shortest_path(graph, path: Optional[List[Node]] = None):
                 nx_graph.add_node(node_id, pos=(j, len(graph) - i), color=color)
                 nx_graph.add_node(neighbor_id, pos=(j + neighbor[1], len(graph) - (i + neighbor[0])),
                                   color=color_neighbor)
-                nx_graph.add_edge(node_id, neighbor_id, weight=graph.cost[neighbor] if neighbor in graph.cost else 1,
-                                  color=edge_color)
+                nx_graph.add_edge(node_id, neighbor_id, color=edge_color)
 
     # Display the graph
     plt.figure(figsize=(len(graph[0]) / 2, len(graph) / 2))

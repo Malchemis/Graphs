@@ -161,7 +161,7 @@ En ajoutant un ensemble (set) pour suivre les nœuds dans open set, on optimise 
 Cependant, ces améliorations ne changent pas la complexité dominante de l'algorithme. L'opération d'extraction du nœud avec le coût \( f \) minimal et l'insertion dans la heap binaire restent les opérations les plus coûteuses et se produisent $\mathcal{O}(E)$ fois. Par conséquent, la complexité temporelle totale reste $\mathcal{O}(E \log V)$.
 
 \subsubsection*{Note}
-La complexité temporelle - $\mathcal{O}(E \log V)$ ou $\mathcal{O}(E \cdot V)$ - est une borne supérieure. En pratique, à moins qu'il n'existe aucun chemin entre les deux nœuds, et pour une bonne heuristique, la complexité temporelle est bien plus faible.
+La complexité temporelle - $\mathcal{O}(E \log V)$ ou $\mathcal{O}(E \cdot V)$ - est une borne supérieure. En pratique, à moins qu'il n'existe aucun chemin entre les deux nœuds de départ et d'arrivée, et pour une bonne heuristique, la complexité temporelle est bien plus faible.
 
 
 \section{Génération de graphes aléatoires}
@@ -201,6 +201,7 @@ def gen_astar(n: int, p: float, file_name: str = "astar.txt"):
 
 Les deux méthodes étant fondamentalement différentes, nous pouvons observer de légères différences sur les résultats obtenus.
 
+Les plots ont été générés grâce à la librairie \texttt{matplotlib} et {networkx} de Python. Cette dernière n'a été utilise que pour la visualisation des graphes, et non pour la résolution du problème. Une visualisation n'utilisant qu'opencv et nos structures dédiées existe également.
 Les graphiques suivants représentent le réseau de sommets liés par des arêtes, avec le sommet de départ en vert, le sommet d'arrivée en bleu clair, et le chemin trouvé en rouge.
 
 Nous avons une légère différence dans le chemin trouvé par CPLEX et A Star sur le réseau \texttt{reseau\_20\_20\_1}:
@@ -226,22 +227,14 @@ Nous avons une légère différence dans le chemin trouvé par CPLEX et A Star s
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
         \hline
-        \textbf{Méthode / Taille du graphe} & 10 & 15 & 30 & 60 & 120 \\
+        \textbf{Méthode / Taille du graphe} & $10^2$ & $15^2$ & $30^2$ & $60^2$ & $120^2$ \\
         \hline
-        \textbf{A*} & 0.02184 & 0.00013 & 0.00051 & 0.00248 & 0.00804s \\
+        \textbf{CPLEX} & 0.00009 &  0.00013 & 0.00051 & 0.00248 & 0.00804s \\
         \hline
-        \textbf{CPLEX} & 0.00009 & 0.04013 & 0.19364 & 0.56905 & 2.36712s \\
+        \textbf{A*} & 0.02184 & 0.04013 & 0.19364 & 0.56905 & 2.36712s \\
         \hline
     \end{tabular}
     \caption{Temps d'exécution (s) des deux méthodes en fonction de la taille du graphe. Moyenne obtenue sur 100 itérations. Densité des arêtes : 0.3}
 \end{table}
 
-n= 120, p=0.3
-h=0 : 0.00965s
-h=euclidienne : 0.01021s
-h=manhattan : 0.01002s
-
-n=500, p=0.3
-h=0 : 0.12651s
-h=euclidienne : 0.12993s
-h=manhattan : 0.12056s
+Changer la valeur de la fonction heuristique n'a que peu d'impact sur le temps de calcul. Par exemple pour un graphe $120 \times 120$ avec une densité de 0.3, le temps de calcul est de 0.00804s avec la distance euclidienne, de 0.01021s avec la distance de Manhattan, et de 0.00965s avec une heuristique nulle. Augmenter la taille du graphe ne semble pas change cette égalité : pour un graphe $500 \times 500$ avec une densité de 0.3, le temps de calcul est de 0.12993s avec la distance euclidienne, de 0.12056s avec la distance de Manhattan, et de 0.12651s avec une heuristique nulle.

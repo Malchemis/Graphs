@@ -7,13 +7,13 @@ Le problème du voyageur de commerce (TSP) consiste à trouver le plus court che
 \label{sec:tsp_model}
 On considère un graphe non orienté $G=<S,A>$ où $S$ est l'ensemble des sommets et $A$ l'ensemble des arêtes. À chaque arête $a_{ij}$ est associée une distance $c_{ij}$. On cherche à déterminer le plus court chemin passant par chaque sommet une et une seule fois, et revenant au sommet de départ.
 
-\subsection*{Variables}
+\subsection{Variables}
 
 \begin{itemize}
     \item $x_{ij}$ : vaut 1 si l'arête $a_{ij}$ est empruntée, 0 sinon
 \end{itemize}
 
-\subsection*{Fonction objectif}
+\subsection{Fonction objectif}
 
 On cherche à minimiser la somme des distances des arêtes empruntées :
 
@@ -21,7 +21,7 @@ On cherche à minimiser la somme des distances des arêtes empruntées :
     \min \sum_{(i,j) \in A} c_{ij} \cdot x_{ij}
 \end{equation}
 
-\subsection*{Contraintes}
+\subsection{Contraintes}
 
 \begin{itemize}
     \item Chaque sommet doit être relié à une arête entrante :

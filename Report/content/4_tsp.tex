@@ -5,7 +5,7 @@ Le problème du voyageur de commerce (TSP) consiste à trouver le plus court che
 
 \section{Modélisation}
 \label{sec:tsp_model}
-On considère un graphe non orienté $G=<S,A>$ où $S$ est l'ensemble des sommets et $A$ l'ensemble des arêtes. À chaque arête $a_{ij}$ est associée une distance $c_{ij}$. On cherche à déterminer le plus court chemin passant par chaque sommet une et une seule fois, et revenant au sommet de départ.
+On considère un graphe non orienté $G=<S,A>$ où $S$ est l'ensemble des sommets et $A$ l'ensemble des arêtes. À chaque arête $a_{ij}$ est associée une distance $c_{ij}$. On détermine le plus court chemin passant une fois par chaque sommet, et revenant au sommet de départ.
 
 \subsection{Variables}
 
@@ -83,7 +83,7 @@ Nous choisissons des coûts entre 10 et 50, et les villes ont une probabilité $
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{resources/gen_tsp.png}
+    \includegraphics[width=.86\textwidth]{resources/gen_tsp.png}
     \caption{Fonction de génération de graphes aléatoires pour le TSP}
     \label{fig:gen_tsp}
 \end{figure}
@@ -109,12 +109,23 @@ Nous pouvons désormais comparer le temps d'exécution des deux méthodes en fon
         \hline
         \textbf{CPLEX} & 0.012 & 0.012 & 0.013 & 0.014 & 0.023 & 0.04 \\
         \hline
-        \textbf{Énumération} & 0.00005 & 0.025 & 2.11 & 338.57 & ? & ? \\
+        \textbf{Énumération} & 0.00005 & 0.025 & 2.11 & 338.57 & $10^3$ & >> $10^3$ \\
         \hline
     \end{tabular}
     \caption{Temps d'exécution (s) des deux méthodes en fonction de la taille du graphe}
 \end{table}
 
+Nous extrapolons les résultats par une régression linéaire pour obtenir une estimation du temps d'exécution pour des graphes de taille supérieure à 12 avec la méthode par énumération.
+
 Nous constatons que la méthode par énumération devient rapidement impraticable pour des graphes de taille supérieure à 10, alors que la méthode CPLEX reste efficace pour des graphes de taille plus importante. Cela est dû à la complexité exponentielle de la méthode par énumération.
 
- TODO: comparer avec la complexité théorique
+\newpage
+
+Voici un autre exemple de résolution du TSP avec un graphe de 20 villes généré aléatoirement : 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{resources/20_20_tsp.png}
+    \caption{Résolution d'un exemple de TSP avec 20 villes}
+    \label{fig:2020_tsp}
+\end{figure}

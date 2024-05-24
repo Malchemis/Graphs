@@ -131,9 +131,9 @@ Les voisins des noeuds sont stockés dans un attribut de chaque noeud et initial
 Sans l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une liste non ordonnée. Les opérations de recherche du nœud avec le coût \( f \) minimal et l'insertion d'un nouveau nœud sont coûteuses :
 
 \begin{itemize}
-    \item Extraction du nœud avec le coût \( f \) minimal : \( O(n) \)
-    \item Insertion d'un nouveau nœud : \( O(1) \)
-    \item Vérification de la présence dans open set : \( O(n) \)
+    \item Extraction du nœud avec le coût \( f \) minimal :$\mathcal{O}(n)$
+    \item Insertion d'un nouveau nœud : $\mathcal{O}(1)$
+    \item Vérification de la présence dans open set : $\mathcal{O}(n)$
 \end{itemize}
 
 La complexité temporelle totale est alors \( O(E \cdot V) \), où \( E \) est le nombre d'arêtes et \( V \) est le nombre de nœuds.
@@ -142,26 +142,30 @@ La complexité temporelle totale est alors \( O(E \cdot V) \), où \( E \) est l
 Avec l'utilisation de heap queue, l'ensemble des nœuds ouverts (open set) est géré comme une heap binaire. Cela optimise les opérations suivantes :
 
 \begin{itemize}
-    \item Extraction du nœud avec le coût \( f \) minimal : \( O(\log n) \)
-    \item Insertion d'un nouveau nœud : \( O(\log n) \)
-    \item Vérification de la présence dans open set : \( O(n) \)
+    \item Extraction du nœud avec le coût \( f \) minimal : $\mathcal{O}(\log n)$
+    \item Insertion d'un nouveau nœud : $\mathcal{O}(log n)$
+    \item Vérification de la présence dans open set : $\mathcal{O}(n)$
 \end{itemize}
 
-Même si la vérification de la présence reste coûteuse, les opérations de base de l'algorithme, à savoir l'extraction et l'insertion dans la heap, dominent la complexité globale. La complexité temporelle totale est donc \( O(E \log V) \).
+Même si la vérification de la présence reste coûteuse, les opérations de base de l'algorithme, à savoir l'extraction et l'insertion dans la heap, dominent la complexité globale. La complexité temporelle totale est donc $\mathcal{O}(E \log V)$.
 
 \subsubsection*{Complexité temporelle avec heap queue et ensemble (set)}
 En ajoutant un ensemble (set) pour suivre les nœuds dans open set, on optimise la vérification de la présence :
 
 \begin{itemize}
-    \item Extraction du nœud avec le coût \( f \) minimal : \( O(\log n) \)
-    \item Insertion d'un nouveau nœud : \( O(\log n) \)
-    \item Vérification de la présence dans open set : \( O(1) \)
+    \item Extraction du nœud avec le coût \( f \) minimal : $\mathcal{O}(\log n)$
+    \item Insertion d'un nouveau nœud : $\mathcal{O}(\log n)$
+    \item Vérification de la présence dans open set : $\mathcal{O}(1)$
 \end{itemize}
 
-Cependant, ces améliorations ne changent pas la complexité dominante de l'algorithme. L'opération d'extraction du nœud avec le coût \( f \) minimal et l'insertion dans la heap binaire restent les opérations les plus coûteuses et se produisent \( O(E) \) fois. Par conséquent, la complexité temporelle totale reste \( O(E \log V) \).
+Cependant, ces améliorations ne changent pas la complexité dominante de l'algorithme. L'opération d'extraction du nœud avec le coût \( f \) minimal et l'insertion dans la heap binaire restent les opérations les plus coûteuses et se produisent $\mathcal{O}(E)$ fois. Par conséquent, la complexité temporelle totale reste $\mathcal{O}(E \log V)$.
 
 \subsubsection*{Note}
+<<<<<<< HEAD
 La complexité temporelle - \( O(E \log V) \) ou \( O(E \cdot V) \) - est une borne supérieure. En pratique, à moins qu'il n'existe aucun chemin entre les deux nœuds, et pour une bonne heuristique, la complexité temporelle est bien plus faible.
+=======
+La complexité temporelle - $\mathcal{O}(E \log V)$ ou $\mathcal{O}(E \cdot V)$ - est une borne supérieure. En pratique, à moins qu'il n'existe aucun chemin entre les deux nœuds, et pour une bonne heuristique, la complexité temporelle est bien plus faible.
+>>>>>>> e6a3205338db93e50d10fc9981d58f7e32fadfbc
 
 
 \section{Génération de graphes aléatoires}
